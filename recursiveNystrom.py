@@ -4,6 +4,7 @@ from scipy.sparse.linalg import eigs
 from scipy.linalg import eigh
 import random
 from scipy.spatial.distance import cdist
+from utils import lev_plot
 
 def is_pos_def(x, tol=1e-8):
     return np.all(np.linalg.eigvals(x) > -tol)
@@ -50,7 +51,6 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
     # diagonal of the whole matrix is np.diag(K)
 
     # main recursion, unrolled for efficiency
-    print(nLevels)
     for l in range(nLevels-1,-1,-1):
         # indices of current uniform samples
         rIndCurr = perm[0:lSize[l]]
@@ -78,13 +78,13 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
             lambda_ = 10e-6
             # don't set to zero for stability issues
         else:
-            lambda_ = ( np.sum(np.diag(SKS)*np.squeeze(weights**2)) - \
+            lambda_ = ( np.sum(np.diag(SKS)*np.squeeze((weights**2))) - \
                 np.sum(np.abs(np.real( eigs(SKS*(weights**2), k, ncv=400)[0] ))) ) / k
-            print("lambda =", lambda_)
-            # lambda_ = 1.8
+            # print(lambda_)
+            # lambda_ = 1.0
             # for the case when lambda may be set to zero
-            # if lambda_ < 10e-6:
-            #     lambda_ = 10e-6
+            if lambda_ < 10e-6:
+                lambda_ = 10e-6
             # print(np.diag(SKS))
             # print("sum first:", np.sum(np.diag(SKS)*weights**2), \
                 # "sum second:", np.sum(np.abs(np.real( eigs(SKS*(weights**2), k)[0] ))), "lambda:", lambda_)
@@ -94,13 +94,11 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
         if l!=0:
             # on intermediate levels, we independently sample each column
             # by its leverage score. the sample size is sLevel in expectation
-            # print("shape of inner mat", np.squeeze(weights**-2).shape)
-            # print("shape of R:", np.diag(lambda_*np.squeeze(weights**-2)).shape)
-            R = np.linalg.inv(SKS + np.diag(lambda_*np.squeeze(weights**-2)))
+            R = np.linalg.inv(SKS + np.diag(lambda_*np.squeeze(weights**(-2))))
             # max(0,.) helps avoid numerical issues, unnecessary in theory
             levs = np.minimum( np.ones_like(rIndCurr), oversamp*(1/lambda_)*\
                 np.maximum(np.zeros_like(rIndCurr), np.diag(K)[rIndCurr]- np.sum((KS@R)*KS, axis=1)) )
-            # levs = rescale_levs(levs)
+            #levs = rescale_levs(levs)
             samp = np.where( np.random.random(lSize[l]) < levs )[0]
             # with very low probability, we could accidentally sample no
             # columns. In this case, just take a fixed size uniform sample.
@@ -111,16 +109,16 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
             weights = np.sqrt(1 / levs[samp])
         else:
             # on the top level, we sample exactly s landmark points without replacement
-            # print("shape of inner mat", np.squeeze(weights**-2).shape)
-            # print("shape of R:", np.diag(lambda_*np.squeeze(weights**-2)).shape)
-            R = np.linalg.inv(SKS + np.diag(lambda_*np.squeeze(weights**-2)))
+            R = np.linalg.inv(SKS + np.diag(lambda_*np.squeeze(weights**(-2))))
             levs = np.minimum(np.ones_like(rIndCurr), (1/lambda_)*\
                 np.maximum(np.zeros_like(rIndCurr), np.diag(K)[rIndCurr]- np.sum((KS@R)*KS, axis=1)) )
             # levs = rescale_levs(levs)
             samp = np.random.choice(n, size=s, replace=False, p=levs/sum(levs))
             pass
         rInd = perm[samp]
+        # print("lambda in round: ",lambda_, "and leverage scores are: ", levs, "and length of the samples: ", len(levs))
 
+    # lev_plot(levs, "Twitter")
     C = K[:][:, rInd]
     SKS = C[rInd]
     # correct SKS for min Eig
@@ -138,7 +136,7 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
 
 def wrapper_for_recNystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal", normalize="rows", expand=False):
     eps = 1e-3
-    mult = 1.0
+    mult = 1.8
     error_list = []
     abs_error_list = []
     n = len(similarity_matrix)
@@ -158,7 +156,6 @@ def wrapper_for_recNystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="
                 pass
         else:
             min_eig_A = 0
-        pass
 
         if mode == "eigI":
             pass

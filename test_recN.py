@@ -21,8 +21,9 @@ mode = "normal"
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
 filename = "twitter"
-similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
+# similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
 # similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
+similarity_matrix = read_file("../GYPSUM/predicts_0.npy")
 error_list = []
 abs_error_list = []
 

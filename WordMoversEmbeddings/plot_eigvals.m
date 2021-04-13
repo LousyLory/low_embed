@@ -2,30 +2,31 @@ clear all;
 close all;
 clc;
 
-dataset = "rte";
+dataset = "kong";
 % format the original matrix
-original_matrix = readNPY(strcat("../../GYPSUM/",dataset,"_predicts_0.npy"));
+% original_matrix = readNPY(strcat("../../GYPSUM/",dataset,"_predicts_0.npy"));
+original_matrix = readNPY("../../GYPSUM/kong_similarity.npy");
 % original_matrix = load(strcat("./mat_files/",dataset,"_K_set1.mat")).trainData;
 % original_matrix = load(strcat("./mat_files/","twitter_K_set1")).trainData;
 % original_matrix = original_matrix(:,2:end);
 
-[max_vals, max_indices] = max(original_matrix, [], 2);
-max_indices(max_indices==1) = 0;
-max_indices(max_indices==2) = 1; 
+% [max_vals, max_indices] = max(original_matrix, [], 2);
+% max_indices(max_indices==1) = 0;
+% max_indices(max_indices==2) = 1; 
 
-% max_indices = original_matrix;
+max_indices = original_matrix;
 
-id_count = sqrt(length(max_indices));
-% id_count = length(max_indices);
+% id_count = sqrt(length(max_indices));
+id_count = length(max_indices);
 reshaped_matrix = reshape(max_indices, id_count, id_count);
-reshaped_matrix = 1 - reshaped_matrix;
+% reshaped_matrix = 1 - reshaped_matrix;
 
 % non_ero_prcntg = nnz(reshaped_matrix) / (size(reshaped_matrix,1)*size(reshaped_matrix,2))
 % non_zero_vals = nonzeros(reshaped_matrix);
 % scatter(non_zero_vals)
 
 % symmetrize the matrix
-reshaped_matrix = (reshaped_matrix+reshaped_matrix')/2 ;
+% reshaped_matrix = (reshaped_matrix+reshaped_matrix')/2 ;
 
 % get the eigenvalues
 eigenvals = eig(reshaped_matrix);

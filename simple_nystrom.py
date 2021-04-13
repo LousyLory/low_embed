@@ -36,15 +36,15 @@ similarity_matrix_O = similarity_matrix[indices][:, indices]
 similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
 
 if filename == "rte":
-	similarity_matrix = 1-similarity_matrix
-	similarity_matrix_O = 1-similarity_matrix_O
+	similarity_matrix = similarity_matrix
+	similarity_matrix_O = similarity_matrix_O
 
 # print()
 
 #similarity_matrix_O = deepcopy(similarity_matrix)
 # similarity_matrix_O = similarity_matrix
 
-id_count = 500 #len(similarity_matrix) #1000
+id_count = 450 #len(similarity_matrix) #1000
 
 avg_min_eig_vec = []
 for k in tqdm(range(10, id_count, 10)):

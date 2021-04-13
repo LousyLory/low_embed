@@ -29,6 +29,8 @@ def plot(dataset, eigenvals, ipsd, rank):
         dataset = "RTE"
     if dataset == "Oshumed":
         dataset = "Ohsumed"
+    if dataset == "kong_sigmoid":
+        dataset = "DonkeyKong Sigmoid"
     x_axis = list(range(1,len(eigenvals)+1))
 
     plt.rc('axes', titlesize=13)
@@ -115,5 +117,5 @@ def plot_validation(dataset, validation):
     plt.savefig("figures/final_"+dataset+"_validation_plot.pdf")
     plt.close()
 
-# read_mat_eig_file("./WordMoversEmbeddings/")
-read_mat_val_file("./WordMoversEmbeddings/")
+read_mat_eig_file("./WordMoversEmbeddings/")
+# read_mat_val_file("./WordMoversEmbeddings/")

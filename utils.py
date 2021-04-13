@@ -199,3 +199,37 @@ def viz_eigenvalues(A, name="test"):
         plt.savefig("figures/eigenvalue"+name+".pdf")
         plt.clf()
         return None
+
+def lev_plot(data, dataset):
+    x_axis = list(range(len(data)))
+
+    plt.rc('axes', titlesize=13)
+    plt.rc('axes', labelsize=13)
+    plt.rc('xtick', labelsize=13)
+    plt.rc('ytick', labelsize=13)
+    plt.rc('legend', fontsize=11)
+
+    STYLE_MAP = {"data": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'scores', 'linewidth': 1},
+            }
+
+    plt.gcf().clear()
+    scale_ = 0.55
+    new_size = (scale_ * 10, scale_ * 8.5)
+    plt.gcf().set_size_inches(new_size)
+
+    title_name = dataset
+
+    data_pairs = [(x, y) for x, y in zip(x_axis, data)]
+    arr1 = np.array(data_pairs)
+    plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP['data'])
+    plt.locator_params(axis='x', nbins=6)
+    plt.xlabel("Samples")
+    plt.ylabel("Leverage scores")
+    plt.title(title_name, fontsize=13)
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.legend(loc='upper right')
+    plt.savefig("figures/leverage_score_plot.pdf")
+    # plt.savefig("./test1.pdf")
+    plt.gcf().clear()
+    
+    return None

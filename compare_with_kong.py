@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import skimage.io
 from skimage import feature
 # from utils import is_pos_semi_def as is_psd
-from measures import sigmoid
+from measures import sigmoid, tps
 # import numpy as np
 # import matplotlib.pyplot as plt
 import sys
@@ -34,17 +34,32 @@ xy = xy[xy_sampled_idxs, :]
 xy[:,0] = -xy[:,0]
 y_min = np.min(xy[:,0])
 xy[:,0] = xy[:,0]-y_min
+xy = xy.astype(np.float)
+# add noise
+# noise_matrix = np.random.random(xy.shape)
+# xy = xy+noise_matrix
+#normalize between 0 and 1
+# print(xy.dtype, xy[0,:], np.float(np.max(xy[:,0])), np.float(np.max(xy[:,1])))
+xy[:, 0] = xy[:,0] / np.max(xy[:,0])
+xy[:, 1] = xy[:,1] / np.max(xy[:,1])
+# print(xy[0,:])
+# print(xy)
+# print(np.max(xy[:,0]), np.max(xy[:,1]))
+# plt.scatter(xy[:,1], xy[:,0])
+# plt.show()
+
 
 ##############################################################################
 ######################### create similarity matrix ###########################
 # define the measure first
-similarity_matrix = sigmoid(xy, xy)
-# np.save("../GYPSUM/kong_similarity.npy", similarity_matrix)
+similarity_matrix = tps(xy, xy)
+# np.save("../GYPSUM/kong_sigmoid_similarity.npy", similarity_matrix)
 similarity_matrix_O = similarity_matrix
+# print("rank:",np.linalg.matrix_rank(similarity_matrix))
 # print(is_psd(similarity_matrix))
-
-##############################################################################
-######################### eigenvalue plot ####################################
+# plt.imshow(similarity_matrix)
+# plt.show()
+# print(np.min(similarity_matrix), np.max(similarity_matrix))
 
 ##############################################################################
 ######################### set up #############################################
@@ -61,7 +76,7 @@ from Nystrom import simple_nystrom
 
 for k in tqdm(range(10, id_count, 10)):
     error, _, _, _ = simple_nystrom(similarity_matrix, similarity_matrix_O, \
-    	k, runs=runs_, mode='eigI', normalize=norm_type, expand=expand_eigs)
+    	k, runs=runs_, mode='normal', normalize=norm_type, expand=expand_eigs)
     uni_eig_error_list.append(error)
     del _
     pass
@@ -74,7 +89,7 @@ from CUR import simple_CUR
 
 for k in tqdm(range(10, id_count, 10)):
     error, _, _, _ = simple_CUR(similarity_matrix, similarity_matrix_O, \
-    	k, runs=runs_, mode='eigI', normalize=norm_type, expand=expand_eigs)
+    	k, runs=runs_, mode='normal', normalize=norm_type, expand=expand_eigs)
     uni_CUR_error_list.append(error)
     del _
     pass
@@ -86,7 +101,7 @@ from anchor import simple_anchor
 
 for k in tqdm(range(10, id_count, 10)):
     error, _, _, _ = simple_anchor(xy, similarity_matrix, similarity_matrix_O, \
-    	k, runs=runs_, mode='eigI', normalize=norm_type, expand=expand_eigs)
+    	k, runs=runs_, mode='normal', normalize=norm_type, expand=expand_eigs)
     anchor_error_list.append(error)
     del _
     pass
@@ -113,7 +128,7 @@ scale_ = 0.55
 new_size = (scale_ * 10, scale_ * 8.5)
 plt.gcf().set_size_inches(new_size)
 
-title_name = "DonkeyKong Sigmoid"
+title_name = "DonkeyKong TPS"
 
 uniform_eig_error_pairs = [(x, y) for x, y in zip(x_axis, uni_eig_error_list)]
 #uniform_norm_error_pairs = [(x, y) for x, y in zip(x_axis, uni_norm_error_list)]
@@ -131,12 +146,12 @@ plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP['uniform eig error'])
 plt.plot(arr4[:, 0], arr4[:, 1], **STYLE_MAP['uniform CUR error'])
 plt.plot(arr5[:, 0], arr5[:, 1], **STYLE_MAP['anchor net'])
 plt.locator_params(axis='x', nbins=6)
-# plt.ylim(bottom=0.0, top=100)
+plt.ylim(bottom=0.0, top=0.4)
 plt.xlabel("Number of landmark samples")
 plt.ylabel("Average approximation error")
 plt.title(title_name, fontsize=13)
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.legend(loc='upper right')
-plt.savefig("figures/comparison_with_kong_errors.pdf")
+plt.savefig("figures/comparison_with_kong_tps_errors.pdf")
 # plt.savefig("./test1.pdf")
 plt.gcf().clear()

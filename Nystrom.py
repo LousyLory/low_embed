@@ -91,6 +91,9 @@ def simple_nystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal",
                 min_eig_A = min(0, np.min(np.linalg.eigvals(A))) - eps
             A = A - mult*(min_eig_A * np.eye(len(A)))
             pass
+        else:
+            min_eig_A = 0+eps
+            A = A-min_eig_A * np.eye(len(A))
         # print("is SKS PSD:", is_pos_def(A))
         D = similarity_matrix[sample_indices].T
 

@@ -9,7 +9,9 @@ def read_mat_eig_file(path_):
     files = glob.glob(path_)
     print(files)
     for f in range(len(files)):
+        print(files[f])
         dataset = files[f].split("_")[-1].split(".")[0]
+        print(dataset)
         mat = sio.loadmat(files[f])
 
         plot(dataset, mat['real_eigenvals'], bool(mat['ipsd'][0]), mat['k'][0][0])
@@ -29,8 +31,12 @@ def plot(dataset, eigenvals, ipsd, rank):
         dataset = "RTE"
     if dataset == "Oshumed":
         dataset = "Ohsumed"
-    if dataset == "kong_sigmoid":
+    if dataset == "kong":
+        dataset = "DonkeyKong"
+    if dataset == "Sigmoid":
         dataset = "DonkeyKong Sigmoid"
+    if dataset == "Tps":
+        dataset = "DonkeyKong TPS"
     x_axis = list(range(1,len(eigenvals)+1))
 
     plt.rc('axes', titlesize=13)

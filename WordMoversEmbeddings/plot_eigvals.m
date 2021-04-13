@@ -2,10 +2,10 @@ clear all;
 close all;
 clc;
 
-dataset = "kong";
+dataset = "kong_tps";
 % format the original matrix
 % original_matrix = readNPY(strcat("../../GYPSUM/",dataset,"_predicts_0.npy"));
-original_matrix = readNPY("../../GYPSUM/kong_similarity.npy");
+original_matrix = readNPY("../../GYPSUM/kong_tps_similarity.npy");
 % original_matrix = load(strcat("./mat_files/",dataset,"_K_set1.mat")).trainData;
 % original_matrix = load(strcat("./mat_files/","twitter_K_set1")).trainData;
 % original_matrix = original_matrix(:,2:end);

@@ -26,6 +26,8 @@ import itertools
 from statsmodels.tools.sequences import halton
 import random
 import matplotlib.pyplot as plt
+from skopt.sampler.halton import Halton
+from skopt.space import Space
 
 def AnchorNet_construction(data, s, q):
     """
@@ -41,11 +43,18 @@ def AnchorNet_construction(data, s, q):
     [n,d] = data.shape
     # create low discrepancy set with s points in the smallest box B0 that contains X
     # (line 1 of algorithm 5.1)
-    T = halton(d, s)
-    # rescale the sequences
-    Omega_end = np.max(data, axis=0)
-    Omega_begin = np.min(data, axis=0)
-    T = T*(Omega_end-Omega_begin)+Omega_begin
+    min_x = np.min(data[:,0])
+    min_y = np.min(data[:,1])
+    max_x = np.max(data[:,0])
+    max_y = np.max(data[:,1])
+    space = Space([(min_x, max_x), (min_y, max_y)])
+    halton = Halton()
+    T = halton.generate(space.dimensions, s)
+    # T = halton(d, s)
+    # # rescale the sequences
+    # Omega_end = np.max(data, axis=0)
+    # Omega_begin = np.min(data, axis=0)
+    # T = T*(Omega_end-Omega_begin)+Omega_begin
 
     # plt.scatter(data[:,1], data[:,0], marker="o")
     # plt.scatter(T[:,1], T[:,0], marker="^")

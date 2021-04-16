@@ -22,10 +22,10 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "mrpc"
+filename = "twitter"
 id_count = 500 #len(similarity_matrix) #1000
-# similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
-similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
+similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
+# similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 # similarity_matrix = read_file("/mnt/nfs/work1/elm/ray/old_predicts_0.npy")
 
 uni_norm_error_list = []
@@ -73,7 +73,7 @@ for k in tqdm(range(10, id_count, 10)):
 """
 
 #################### CUR decomposition no eig ###############################
-#"""
+"""
 from CUR import simple_CUR
 for k in tqdm(range(10, id_count, 10)):
     error, _, _, _ = simple_CUR(similarity_matrix, similarity_matrix_O, \
@@ -94,6 +94,13 @@ for k in tqdm(range(10, id_count, 10)):
 #     del _
 #     pass
 
+########################## drineas CUR #######################################
+#"""
+from CUR_modified import CUR
+for k in tqdm(range(10, id_count, 10)):
+    error = CUR(similarity_matrix, k, k, k, return_type="error")
+    uni_CUR_error_list.append(error)
+#"""
 
 #######################################################################
 # PLOTS
@@ -117,7 +124,7 @@ scale_ = 0.55
 new_size = (scale_ * 10, scale_ * 8.5)
 plt.gcf().set_size_inches(new_size)
 
-title_name = "MRPC"
+title_name = "Twitter"
 
 uniform_eig_error_pairs = [(x, y) for x, y in zip(x_axis, uni_eig_error_list)]
 #uniform_norm_error_pairs = [(x, y) for x, y in zip(x_axis, uni_norm_error_list)]
@@ -141,7 +148,7 @@ plt.ylabel("Average approximation error")
 plt.title(title_name, fontsize=13)
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.legend(loc='upper right')
-plt.savefig("figures/unyst_v_cur_v_anchor_errors_"+filename+".pdf")
+plt.savefig("figures/unyst_v_cur_"+filename+".pdf")
 # plt.savefig("./test1.pdf")
 plt.gcf().clear()
 

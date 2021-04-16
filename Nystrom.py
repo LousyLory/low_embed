@@ -32,7 +32,8 @@ def novel_greedy_nystrom(similarity_matrix, num_imp_samples, runs=1):
     return avg_error
 
 
-def simple_nystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal", normalize="rows", expand=False):
+def simple_nystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal", \
+    normalize="rows", expand=False, correction_mode=False, mult=1.0):
     """
     simple implementation of:
     1. Williams, Christopher KI, and Matthias Seeger. "Using the Nystrom method to speed up kernel machines." 
@@ -53,7 +54,7 @@ def simple_nystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal",
     1. avg_error: avergae of all errors across runs
     """
     eps = 1e-3
-    mult = 1.0
+    # mult = 1.0
     #similarity_matrix = deepcopy(similarity_matrix)
     """
         if is_pos_def(similarity_matrix):
@@ -85,6 +86,9 @@ def simple_nystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal",
                 A_bar = similarity_matrix[sample_indices_bar][:, sample_indices_bar]
                 # print(np.min(np.linalg.eigvals(A_bar)))
                 min_eig_A = min(0, np.min(np.linalg.eigvals(A_bar))) - eps
+                if correction_mode == True:
+                    # print("correction_mode is true")
+                    min_eig_A = min_eig_A*np.float(n) / np.float(new_num)
                 # min_eig_A = np.min(np.linalg.eigvals(A_bar)) - eps
                 # print("min eig A: ", min_eig_A)
             else:

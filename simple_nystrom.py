@@ -22,7 +22,7 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "rte"
+filename = "stsb"
 #similarity_matrix = read_file(pred_id_count=id_count, file_=filename+".npy")
 # similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/recipe_trainData.mat", version="v7.3")
 similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
@@ -100,7 +100,8 @@ plt.ylabel("Approximation error")
 plt.title("Plot of average errors using Nystrom on "+filename+" BERT", fontsize=13)
 plt.tight_layout()
 plt.legend(loc='upper right')
-plt.savefig("./test1.pdf")
+# plt.savefig("./test1.pdf")
+plt.savefig("figures/final_"filename+"_approx_errors.pdf")
 
 plt.gcf().clear()
 
@@ -116,8 +117,8 @@ plt.ylabel("Minimum eigenvalue estimate")
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.legend(loc='upper right')
 plt.title("Plot of minimum eigenvalue estimate", fontsize=13)
-plt.savefig("./test2.pdf")
-# plt.savefig("figures/final_"+approximation_type+filename+"_min_eigenvalue_estimate.pdf")
+# plt.savefig("./test2.pdf")
+plt.savefig("figures/final_"filename+"_min_eigenvalue_estimate.pdf")
 plt.close()
 
 # plt.plot(x, error_list, label="average errors")

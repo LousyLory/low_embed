@@ -1,6 +1,6 @@
 import numpy as np
 
-def CUR(similarity_matrix, c, r, k, return_type="error"):
+def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
 	"""
 	implementation of Linear time CUR algorithm of Drineas2006 et. al.
 
@@ -17,6 +17,18 @@ def CUR(similarity_matrix, c, r, k, return_type="error"):
 
 	"""
 	n,d = similarity_matrix.shape
+	# setting up c, r, eps, and delta for error bound
+	c = (64*k*((1+8*np.log(1/delta))**2) / (eps**4)) + 1
+	r = (4*k / ((delta*eps)**2)) + 1
+	# c = 4*k
+	# c = k
+	# r = k
+	if c > n:
+		c= n
+	# r = 4*k
+	if r > n:
+		r = n
+	print("chosen c, r:", c,r)
 	try:
 		assert 1 <= c and c <= d
 	except AssertionError as error:
@@ -57,19 +69,31 @@ def CUR(similarity_matrix, c, r, k, return_type="error"):
 	psi = psi.T
 
 	# U = np.linalg.pinv(C.T @ C)
-	U = np.linalg.pinv(rank_k_C.T @ rank_k_C)
+	# U = np.linalg.inv(rank_k_C.T @ rank_k_C)
+	U = rank_k_C.T @ rank_k_C
 	# i chose not to compute rank k reduction of U
 	U = U @ psi.T
+	U = np.linalg.pinv(U)
 
 	if return_type == "decomposed":
 		return C, U, R
 	if return_type == "approximate":
 		return (C @ U) @ R
 	if return_type == "error":
+		# print(np.linalg.norm((C @ U) @ R))
 		relative_error = np.linalg.norm(similarity_matrix - ((C @ U) @ R)) / np.linalg.norm(similarity_matrix)
 		return relative_error
 
 
-# X = np.random.random((500,500))
-# X = X.T @ X
-# print("error:", CUR(X, 100, 100, 100, return_type="error"))
+X = np.random.random((500,500))
+X = X.T @ X
+k = 200
+eps = 1e-7
+print("error:", CUR(X, k, eps=eps, return_type="error"))
+s,v,d = np.linalg.svd(X, full_matrices=False)
+samples = range(k)
+s = s[:, samples]
+v = np.diag(v[samples])
+d = d[samples, :]
+rank_k_X = (s @ v) @ d
+print("true error: ", np.linalg.norm(X - rank_k_X)+eps*np.linalg.norm(X))

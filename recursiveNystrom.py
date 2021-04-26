@@ -5,6 +5,7 @@ from scipy.linalg import eigh
 import random
 from scipy.spatial.distance import cdist
 from utils import lev_plot
+import utils
 
 def is_pos_def(x, tol=1e-8):
     return np.all(np.linalg.eigvals(x) > -tol)
@@ -19,7 +20,8 @@ def rescale_levs(levs):
     levs = levs / np.sum(levs);
     return levs
 
-def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=1e-16, accelerated=False):
+def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, \
+    eps=1e-16, accelerated=False, KS_correction=True):
     n = K.shape[0]
     
     if accelerated:
@@ -67,7 +69,8 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
                 minEig = compute_minEig(SKS, eps=eps)
             # correct using precomputed minEig
             cols = list(range(SKSn))
-            KS[samp, cols] = KS[samp, cols] - minEig
+            if KS_correction:
+                KS[samp, cols] = KS[samp, cols] - minEig
             SKS[cols, cols] = SKS[cols, cols] - minEig
         ########################## END MIN EIG CORRECTION ##########################################
         # print("is SkS PSD:", is_pos_def(SKS))
@@ -134,9 +137,10 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, eps=
     return C, W, error, minEig
 
 
-def wrapper_for_recNystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal", normalize="rows", expand=False):
+def wrapper_for_recNystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal", normalize="rows", \
+    expand=False, KS_correction=False):
     eps = 1e-3
-    mult = 1.8
+    mult = 1.0
     error_list = []
     abs_error_list = []
     n = len(similarity_matrix)
@@ -161,7 +165,8 @@ def wrapper_for_recNystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="
             pass
 
         C, W, error, minEig = recursiveNystrom(similarity_matrix, num_imp_samples, \
-            correction=True, minEig=mult*min_eig_A, expand_eigs=True, eps=eps)
+            correction=True, minEig=mult*min_eig_A, expand_eigs=expand, \
+            eps=eps, KS_correction=KS_correction)
 
         rank_l_K = (C @ W) @ C.T
         if np.iscomplexobj(rank_l_K):

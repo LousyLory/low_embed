@@ -4,6 +4,8 @@ import sys
 from copy import deepcopy
 from utils import is_pos_def
 import utils
+import matplotlib.pyplot as plt
+
 # from scipy.sparse.linalg import eig
 def is_pos_def(x, tol=1e-8):
     return np.all(np.linalg.eigvals(x) > -tol)
@@ -100,9 +102,7 @@ def simple_nystrom(similarity_matrix, K, num_imp_samples, runs=1, mode="normal",
             A = A-min_eig_A * np.eye(len(A))
         # print("is SKS PSD:", is_pos_def(A))
         D = similarity_matrix[sample_indices].T
-        correction_of_D = np.zeros_like(D)
-        correction_of_D[sample_indices, sample_indices] = 1
-        D = D - min_eig_A*correction_of_D
+        D[sample_indices, range(D.shape[-1])] -= min_eig_A
 
         if mode == "eye":
             inv_A = np.eye(len(A))  # np.linalg.inv(A)

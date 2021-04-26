@@ -54,7 +54,8 @@ from Nystrom import simple_nystrom
 
 for k in tqdm(range(10, id_count, 10)):
     error, _, _, _ = simple_nystrom(similarity_matrix, similarity_matrix_O, \
-        k, runs=runs_, mode='eigI', normalize=norm_type, expand=expand_eigs)
+        k, runs=runs_, mode='eigI', normalize=norm_type, expand=expand_eigs,
+        correction_mode=True)
     uni_eig_error_list.append(error)
     del _
     pass
@@ -95,10 +96,10 @@ for k in tqdm(range(10, id_count, 10)):
 #     pass
 
 ########################## drineas CUR #######################################
-#"""
+"""
 from CUR_modified import CUR
 for k in tqdm(range(10, id_count, 10)):
-    error = CUR(similarity_matrix, k, k, k, return_type="error")
+    error = CUR(similarity_matrix, k, return_type="error")
     uni_CUR_error_list.append(error)
 #"""
 
@@ -129,17 +130,17 @@ title_name = "Twitter"
 uniform_eig_error_pairs = [(x, y) for x, y in zip(x_axis, uni_eig_error_list)]
 #uniform_norm_error_pairs = [(x, y) for x, y in zip(x_axis, uni_norm_error_list)]
 #leverage_error_pairs = [(x, y) for x, y in zip(x_axis, lev_error_list)]
-uniform_CUR_error_pairs = [(x, y) for x, y in zip(x_axis, uni_CUR_error_list)]
+# uniform_CUR_error_pairs = [(x, y) for x, y in zip(x_axis, uni_CUR_error_list)]
 # anchor_error_pairs = [(x, y) for x, y in zip(x_axis, anchor_error_list)]
 arr1 = np.array(uniform_eig_error_pairs)
 #arr2 = np.array(leverage_error_pairs)
 #arr3 = np.array(uniform_norm_error_pairs)
-arr4 = np.array(uniform_CUR_error_pairs)
+# arr4 = np.array(uniform_CUR_error_pairs)
 # arr5 = np.array(anchor_error_pairs)
 plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP['uniform eig error'])
 #plt.plot(arr2[:, 0], arr2[:, 1], **STYLE_MAP['leverage error'])
 #plt.plot(arr3[:, 0], arr3[:, 1], **STYLE_MAP['uniform normal error'])
-plt.plot(arr4[:, 0], arr4[:, 1], **STYLE_MAP['uniform CUR error'])
+# plt.plot(arr4[:, 0], arr4[:, 1], **STYLE_MAP['uniform CUR error'])
 # plt.plot(arr5[:, 0], arr5[:, 1], **STYLE_MAP['anchor net'])
 plt.locator_params(axis='x', nbins=6)
 # plt.ylim(bottom=0.0, top=100)

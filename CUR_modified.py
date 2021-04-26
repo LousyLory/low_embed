@@ -18,11 +18,11 @@ def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
 	"""
 	n,d = similarity_matrix.shape
 	# setting up c, r, eps, and delta for error bound
-	c = (64*k*((1+8*np.log(1/delta))**2) / (eps**4)) + 1
-	r = (4*k / ((delta*eps)**2)) + 1
+	# c = (64*k*((1+8*np.log(1/delta))**2) / (eps**4)) + 1
+	# r = (4*k / ((delta*eps)**2)) + 1
 	# c = 4*k
-	# c = k
-	# r = k
+	c = k
+	r = k
 	if c > n:
 		c= n
 	# r = 4*k
@@ -55,13 +55,14 @@ def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
 	samp_qi = qi[samples_r]
 	C = similarity_matrix[:, samples_c] / np.sqrt(samp_pj*c)
 	# C = C.T
-	k = min(k, np.linalg.matrix_rank(C.T @ C))
-	s,v,d = np.linalg.svd(C.T @ C, full_matrices=False)
-	s = s[:, range(k)]
-	v = np.diag(v[range(k)])
-	d = d[range(k), :]
-	# print(s.shape, v.shape, d.shape)
-	rank_k_C = (s @ v) @ d
+	# k = min(k, np.linalg.matrix_rank(C.T @ C))
+	# s,v,d = np.linalg.svd(C.T @ C, full_matrices=False)
+	# s = s[:, range(k)]
+	# v = np.diag(v[range(k)])
+	# d = d[range(k), :]
+	# # print(s.shape, v.shape, d.shape)
+	# rank_k_C = (s @ v) @ d
+	rank_k_C = C
 	# modification works only because we assume similarity matrix is symmetric
 	R = similarity_matrix[:, samples_r] / np.sqrt(samp_qi*r)
 	R = R.T
@@ -69,11 +70,11 @@ def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
 	psi = psi.T
 
 	# U = np.linalg.pinv(C.T @ C)
-	# U = np.linalg.inv(rank_k_C.T @ rank_k_C)
-	U = rank_k_C.T @ rank_k_C
+	U = np.linalg.inv(rank_k_C.T @ rank_k_C)
+	# U = rank_k_C.T @ rank_k_C
 	# i chose not to compute rank k reduction of U
 	U = U @ psi.T
-	U = np.linalg.pinv(U)
+	# U = np.linalg.pinv(U)
 
 	if return_type == "decomposed":
 		return C, U, R
@@ -85,15 +86,15 @@ def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
 		return relative_error
 
 
-X = np.random.random((500,500))
-X = X.T @ X
-k = 200
-eps = 1e-7
-print("error:", CUR(X, k, eps=eps, return_type="error"))
-s,v,d = np.linalg.svd(X, full_matrices=False)
-samples = range(k)
-s = s[:, samples]
-v = np.diag(v[samples])
-d = d[samples, :]
-rank_k_X = (s @ v) @ d
-print("true error: ", np.linalg.norm(X - rank_k_X)+eps*np.linalg.norm(X))
+# X = np.random.random((500,500))
+# X = X.T @ X
+# k = 300
+# eps = 1e-7
+# print("error:", CUR(X, k, eps=eps, return_type="error"))
+# s,v,d = np.linalg.svd(X, full_matrices=False)
+# samples = range(k)
+# s = s[:, samples]
+# v = np.diag(v[samples])
+# d = d[samples, :]
+# rank_k_X = (s @ v) @ d
+# print("true error: ", np.linalg.norm(X - rank_k_X)+eps*np.linalg.norm(X))

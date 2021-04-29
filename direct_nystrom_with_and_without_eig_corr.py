@@ -84,7 +84,7 @@ def ratio_nystrom(similarity_matrix, k, min_eig=0.0, min_eig_mode=False, return_
                 / np.linalg.norm(similarity_matrix)
 
 
-def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling=False):
+def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling=False, mult=0):
     """
     compute eigen corrected nystrom approximations
     versions:
@@ -97,7 +97,10 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling
                      list_of_available_indices, k))
     A = similarity_matrix[sample_indices][:, sample_indices]
     # estimating min eig in the following block
-    large_k = np.int(np.sqrt(k*len(similarity_matrix)))
+    if mult == 0:
+        large_k = np.int(np.sqrt(k*len(similarity_matrix)))
+    else:
+        large_k = min(mult*k, len(similarity_matrix)-1)
     larger_sample_indices = np.sort(random.sample(\
                             list_of_available_indices, large_k))
     Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
@@ -116,7 +119,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling
                 / np.linalg.norm(similarity_matrix), min_eig
 
 
-def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
+def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error", same=False):
     """
     implementation of Linear time CUR algorithm of Drineas2006 et. al.
 
@@ -164,7 +167,10 @@ def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error"):
 
     # choose samples
     samples_c = np.random.choice(range(d), c, replace=False, p = pj)
-    samples_r = np.random.choice(range(n), r, replace=False, p = qi)
+    if same:
+        samples_r = samples_c
+    else:
+        samples_r = np.random.choice(range(n), r, replace=False, p = qi)
 
     # grab rows and columns and scale with respective probability
     samp_pj = pj[samples_c]
@@ -220,8 +226,10 @@ min_eig_nscaling = []
 SKS_corrected_error_list = []
 SKS_ncorrected_error_list = []
 SKS_rcorrected_error_list = []
+ZKZ_multiplier_error_list = []
 
-CUR_error_list = []
+CUR_diff_error_list = []
+CUR_same_error_list = []
 
 Lev_corrected_error_list = []
 Lev_ncorrected_error_list = []
@@ -290,6 +298,18 @@ for k in tqdm(range(10, id_count, 10)):
     nscaling_error_list.append(error)
     pass    
 
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    min_eig_agg = 0
+    for j in range(runs_):
+        error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=10)
+        err += error
+        min_eig_agg += min_eig
+    error = err/np.float(runs_)
+    # min_eig_nscaling.append(min_eig_agg/np.float(runs_))
+    ZKZ_multiplier_error_list.append(error)
+    pass   
+
 ################################## RATIO CHECK ################################
 # eps=1e-16
 # min_eig = min(0, np.min(np.linalg.eigvals(similarity_matrix))) - eps
@@ -325,29 +345,39 @@ for k in tqdm(range(10, id_count, 10)):
 #         error = CUR(similarity_matrix, k)
 #         err += error
 #     error = err/np.float(runs_)
-#     CUR_error_list.append(error)
+#     CUR_diff_error_list.append(error)
 #     pass
 
-################################ leverage scores #############################
-for k in tqdm(range(10, id_count, 10)):
-    err = 0
-    for j in range(runs_):
-        error = Lev_samples(similarity_matrix, k)
-        err += error
-    error = err/np.float(runs_)
-    Lev_ncorrected_error_list.append(error)
-    # Lev_error_list.append(error)
-    pass
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     for j in range(runs_):
+#         error = CUR(similarity_matrix, k, same=True)
+#         err += error
+#     error = err/np.float(runs_)
+#     CUR_same_error_list.append(error)
+#     pass
 
-for k in tqdm(range(10, id_count, 10)):
-    err = 0
-    for j in range(runs_):
-        error = Lev_samples(similarity_matrix, k, KS_correction=True)
-        err += error
-    error = err/np.float(runs_)
-    Lev_corrected_error_list.append(error)
-    # Lev_error_list.append(error)
-    pass
+
+################################ leverage scores #############################
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     for j in range(runs_):
+#         error = Lev_samples(similarity_matrix, k)
+#         err += error
+#     error = err/np.float(runs_)
+#     Lev_ncorrected_error_list.append(error)
+#     # Lev_error_list.append(error)
+#     pass
+
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     for j in range(runs_):
+#         error = Lev_samples(similarity_matrix, k, KS_correction=True)
+#         err += error
+#     error = err/np.float(runs_)
+#     Lev_corrected_error_list.append(error)
+#     # Lev_error_list.append(error)
+#     pass
 
 #######################################################################
 # PLOTS
@@ -370,9 +400,11 @@ STYLE_MAP = {"With true eigen correction": {"color": "#4d9221",  "marker": ".", 
              "SKS corrected": {"color": "#EF4026",  "marker": ".", "markersize": 7, 'label': 'SKS corrected', 'linewidth': 1},
              "SKS not corrected": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'SKS not corrected', 'linewidth': 1},
              "SKS ratio corrected": {"color": "#EE82DE",  "marker": ".", "markersize": 7, 'label': 'SKS ratio corrected', 'linewidth': 1},
-             "CUR": {"color": "#EE82DE",  "marker": ".", "markersize": 7, 'label': 'CUR', 'linewidth': 1},
+             "CUR diff": {"color": "#EE82DE",  "marker": ".", "markersize": 7, 'label': 'CUR', 'linewidth': 1},
+             "CUR same": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'CUR same c and r', 'linewidth': 1},
              "RLS KS not corrected": {"color": "#9ACD32",  "marker": ".", "markersize": 7, 'label': 'RLS KS not corrected', 'linewidth': 1},
              "RLS KS corrected": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'RLS KS corrected', 'linewidth': 1},
+             "multiplied Z": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'z = 10s', 'linewidth': 1},
             }
 
 plt.gcf().clear()
@@ -381,7 +413,7 @@ new_size = (scale_ * 10, scale_ * 8.5)
 plt.gcf().set_size_inches(new_size)
 
 title_name = "MRPC"
-directory = "figures/comparison_with_RLS/"
+directory = "figures/comparison_with_sample_multiplier/"
 if not os.path.isdir(directory):
     os.mkdir(directory)
 path = os.path.join(directory, filename+".pdf")
@@ -403,6 +435,10 @@ nscaling_error_pairs = [(x, y) for x, y in zip(x_axis, nscaling_error_list)]
 arr1 = np.array(nscaling_error_pairs)
 plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["With estimated eigen corrected"])
 
+ZKZ_multiplier_error_pairs = [(x, y) for x, y in zip(x_axis, ZKZ_multiplier_error_list)]
+arr1 = np.array(ZKZ_multiplier_error_pairs)
+plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["multiplied Z"])
+
 # SKS_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, SKS_corrected_error_list)]
 # arr1 = np.array(SKS_corrected_error_pairs)
 # plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["SKS corrected"])
@@ -415,20 +451,24 @@ plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["With estimated eigen corrected"])
 # arr1 = np.array(SKS_rcorrected_error_pairs)
 # plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["SKS ratio corrected"])
 
-# CUR_error_pairs = [(x, y) for x, y in zip(x_axis, CUR_error_list)]
-# arr1 = np.array(CUR_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["CUR"])
+# CUR_diff_error_pairs = [(x, y) for x, y in zip(x_axis, CUR_diff_error_list)]
+# arr1 = np.array(CUR_diff_error_pairs)
+# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["CUR diff"])
+
+# CUR_same_error_pairs = [(x, y) for x, y in zip(x_axis, CUR_same_error_list)]
+# arr1 = np.array(CUR_same_error_pairs)
+# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["CUR same"])
 
 # lev_ncorrected_error_pairs = [(x, y) for x, y in zip(x_axis, Lev_ncorrected_error_list)]
 # arr1 = np.array(lev_ncorrected_error_pairs)
 # plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["RLS KS not corrected"])
 
-lev_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, Lev_corrected_error_list)]
-arr1 = np.array(lev_corrected_error_pairs)
-plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["RLS KS corrected"])
+# lev_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, Lev_corrected_error_list)]
+# arr1 = np.array(lev_corrected_error_pairs)
+# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["RLS KS corrected"])
 
 plt.locator_params(axis='x', nbins=6)
-plt.ylim(bottom=0.0, top=0.3)
+# plt.ylim(bottom=0.0, top=0.3)
 plt.xlabel("Number of landmark samples")
 plt.ylabel("Average approximation error")
 plt.title(title_name, fontsize=13)

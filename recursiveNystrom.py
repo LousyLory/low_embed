@@ -81,10 +81,12 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, \
             lambda_ = 10e-6
             # don't set to zero for stability issues
         else:
-            lambda_ = ( np.sum(np.diag(SKS)*np.squeeze((weights**2))) - \
-                np.sum(np.abs(np.real( eigs(SKS*(weights**2), k, ncv=400)[0] ))) ) / k
+            # lambda_ = ( np.sum(np.diag(SKS)*np.squeeze((weights**2))) - \
+            #     np.sum(np.abs(np.real( eigs(SKS*(weights**2), k, ncv=400)[0] ))) ) / k
+            # so for indefinite matrices this lambda is increasing a lot!
+            # lambda_ = min(lambda_,  compute_minEig(SKS, eps=eps))
             # print(lambda_)
-            # lambda_ = 1.0
+            lambda_ = 1.0
             # for the case when lambda may be set to zero
             if lambda_ < 10e-6:
                 lambda_ = 10e-6
@@ -97,7 +99,7 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, \
         if l!=0:
             # on intermediate levels, we independently sample each column
             # by its leverage score. the sample size is sLevel in expectation
-            R = np.linalg.inv(SKS + np.diag(lambda_*np.squeeze(weights**(-2))))
+            R = np.linalg.pinv(SKS + np.diag(lambda_*np.squeeze(weights**(-2))))
             # max(0,.) helps avoid numerical issues, unnecessary in theory
             levs = np.minimum( np.ones_like(rIndCurr), oversamp*(1/lambda_)*\
                 np.maximum(np.zeros_like(rIndCurr), np.diag(K)[rIndCurr]- np.sum((KS@R)*KS, axis=1)) )
@@ -112,7 +114,7 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, \
             weights = np.sqrt(1 / levs[samp])
         else:
             # on the top level, we sample exactly s landmark points without replacement
-            R = np.linalg.inv(SKS + np.diag(lambda_*np.squeeze(weights**(-2))))
+            R = np.linalg.pinv(SKS + np.diag(lambda_*np.squeeze(weights**(-2))))
             levs = np.minimum(np.ones_like(rIndCurr), (1/lambda_)*\
                 np.maximum(np.zeros_like(rIndCurr), np.diag(K)[rIndCurr]- np.sum((KS@R)*KS, axis=1)) )
             # levs = rescale_levs(levs)
@@ -129,7 +131,7 @@ def recursiveNystrom(K, s, correction=True, minEig=1e-16, expand_eigs=True, \
     indices = range(SKSn)
     SKS[indices, indices] = SKS[indices, indices] - minEig + eps
     # print("is SKS PSD:", is_pos_def(SKS))
-    W = np.linalg.inv(SKS+(10e-6)*np.eye(s))
+    W = np.linalg.pinv(SKS+(10e-6)*np.eye(s))
 
 
     error = np.linalg.norm(K - (C@W)@C.T) / np.linalg.norm(K)

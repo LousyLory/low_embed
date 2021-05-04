@@ -105,6 +105,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling
                             list_of_available_indices, large_k))
     Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
     min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
+    min_eig = 2.7*min_eig
     if scaling == True:
         min_eig = min_eig*np.float(len(similarity_matrix))/np.float(large_k)
 
@@ -210,7 +211,7 @@ runs_ = 3
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
 filename = "mrpc"
-id_count = 450 #len(similarity_matrix) #1000
+id_count = 500 #len(similarity_matrix) #1000
 # similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
 similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 
@@ -298,17 +299,17 @@ for k in tqdm(range(10, id_count, 10)):
     nscaling_error_list.append(error)
     pass    
 
-for k in tqdm(range(10, id_count, 10)):
-    err = 0
-    min_eig_agg = 0
-    for j in range(runs_):
-        error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=10)
-        err += error
-        min_eig_agg += min_eig
-    error = err/np.float(runs_)
-    # min_eig_nscaling.append(min_eig_agg/np.float(runs_))
-    ZKZ_multiplier_error_list.append(error)
-    pass   
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     min_eig_agg = 0
+#     for j in range(runs_):
+#         error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=10)
+#         err += error
+#         min_eig_agg += min_eig
+#     error = err/np.float(runs_)
+#     # min_eig_nscaling.append(min_eig_agg/np.float(runs_))
+#     ZKZ_multiplier_error_list.append(error)
+#     pass   
 
 ################################## RATIO CHECK ################################
 # eps=1e-16
@@ -366,7 +367,6 @@ for k in tqdm(range(10, id_count, 10)):
 #         err += error
 #     error = err/np.float(runs_)
 #     Lev_ncorrected_error_list.append(error)
-#     # Lev_error_list.append(error)
 #     pass
 
 # for k in tqdm(range(10, id_count, 10)):
@@ -413,7 +413,7 @@ new_size = (scale_ * 10, scale_ * 8.5)
 plt.gcf().set_size_inches(new_size)
 
 title_name = "MRPC"
-directory = "figures/comparison_with_sample_multiplier/"
+directory = "figures/comparison_debug/"
 if not os.path.isdir(directory):
     os.mkdir(directory)
 path = os.path.join(directory, filename+".pdf")
@@ -435,9 +435,9 @@ nscaling_error_pairs = [(x, y) for x, y in zip(x_axis, nscaling_error_list)]
 arr1 = np.array(nscaling_error_pairs)
 plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["With estimated eigen corrected"])
 
-ZKZ_multiplier_error_pairs = [(x, y) for x, y in zip(x_axis, ZKZ_multiplier_error_list)]
-arr1 = np.array(ZKZ_multiplier_error_pairs)
-plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["multiplied Z"])
+# ZKZ_multiplier_error_pairs = [(x, y) for x, y in zip(x_axis, ZKZ_multiplier_error_list)]
+# arr1 = np.array(ZKZ_multiplier_error_pairs)
+# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["multiplied Z"])
 
 # SKS_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, SKS_corrected_error_list)]
 # arr1 = np.array(SKS_corrected_error_pairs)
@@ -468,7 +468,7 @@ plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["multiplied Z"])
 # plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["RLS KS corrected"])
 
 plt.locator_params(axis='x', nbins=6)
-# plt.ylim(bottom=0.0, top=0.3)
+# plt.ylim(bottom=0.0, top=1)
 plt.xlabel("Number of landmark samples")
 plt.ylabel("Average approximation error")
 plt.title(title_name, fontsize=13)

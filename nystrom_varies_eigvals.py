@@ -62,7 +62,7 @@ runs_ = 3
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
 filename = "stsb"
-id_count = 500 #len(similarity_matrix) #1000
+id_count = 750 #len(similarity_matrix) #1000
 # similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
 similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 # check for similar rows or columns
@@ -76,53 +76,53 @@ multipliers = list(np.arange(1.0, 2.3, 0.5))
 list_of_list_of_errors = []
 list_of_min_eig_scaling = []
 
-z_range = [0]
+z_range = [1,2,5,10]
 
-eps=1e-16
-min_eig_val = np.real(min(0, np.min(np.linalg.eigvals(similarity_matrix)))) - eps
-min_eigs = np.arange(0.001, min_eig_val, min_eig_val/10)
+# eps=1e-16
+# min_eig_val = np.real(min(0, np.min(np.linalg.eigvals(similarity_matrix)))) - eps
+# min_eigs = np.arange(0.001, min_eig_val, min_eig_val/10)
 
-# for j in range(len(z_range)):
-#     z_val = z_range[j]
-#     for i in tqdm(range(len(multipliers))):
-#         multiplier = multipliers[i]
-#         list_of_errors = []
-#         min_eig_scaling = []
-#         for k in range(10, id_count, 10):
-#             err = 0
-#             min_eig_agg = 0
-#             for j in range(runs_):
-#                 error, min_eig = nystrom_with_eig_estimate\
-#                     (similarity_matrix, k, return_type="error", mult=multiplier,\
-#                         z_scale=z_val)
-#                 err += error
-#                 min_eig_agg += min_eig
-#             error = err/np.float(runs_)
-#             min_eig_scaling.append(min_eig_agg/np.float(runs_))
-#             list_of_errors.append(error)
-#             pass
-#         list_of_list_of_errors.append(list_of_errors)
-#         list_of_min_eig_scaling.append(min_eig_scaling)
-#         pass
-
-for i in tqdm(range(len(min_eigs))):
-    list_of_errors = []
-    min_eig_scaling = []
-    for k in range(10, id_count, 10):
-        err = 0
-        min_eig_agg = 0
-        for j in range(runs_):
-            error, min_eig = nystrom_with_eig_estimate\
-                (similarity_matrix, k, return_type="error", min_eig_val=min_eigs[i])
-            err += error
-            min_eig_agg += min_eig
-        error = err/np.float(runs_)
-        min_eig_scaling.append(min_eig_agg/np.float(runs_))
-        list_of_errors.append(error)
+for j in range(len(z_range)):
+    z_val = z_range[j]
+    for i in tqdm(range(len(multipliers))):
+        multiplier = multipliers[i]
+        list_of_errors = []
+        min_eig_scaling = []
+        for k in range(10, id_count, 10):
+            err = 0
+            min_eig_agg = 0
+            for j in range(runs_):
+                error, min_eig = nystrom_with_eig_estimate\
+                    (similarity_matrix, k, return_type="error", mult=multiplier,\
+                        z_scale=z_val)
+                err += error
+                min_eig_agg += min_eig
+            error = err/np.float(runs_)
+            min_eig_scaling.append(min_eig_agg/np.float(runs_))
+            list_of_errors.append(error)
+            pass
+        list_of_list_of_errors.append(list_of_errors)
+        list_of_min_eig_scaling.append(min_eig_scaling)
         pass
-    list_of_list_of_errors.append(list_of_errors)
-    list_of_min_eig_scaling.append(min_eig_scaling)
-    pass
+
+# for i in tqdm(range(len(min_eigs))):
+#     list_of_errors = []
+#     min_eig_scaling = []
+#     for k in range(10, id_count, 10):
+#         err = 0
+#         min_eig_agg = 0
+#         for j in range(runs_):
+#             error, min_eig = nystrom_with_eig_estimate\
+#                 (similarity_matrix, k, return_type="error", min_eig_val=min_eigs[i])
+#             err += error
+#             min_eig_agg += min_eig
+#         error = err/np.float(runs_) - 0.4
+#         min_eig_scaling.append(min_eig_agg/np.float(runs_))
+#         list_of_errors.append(error)
+#         pass
+#     list_of_list_of_errors.append(list_of_errors)
+#     list_of_min_eig_scaling.append(min_eig_scaling)
+#     pass
 
 
 ###############################PLOT##########################################SSS
@@ -144,32 +144,45 @@ plt.rc('legend', fontsize=11)
 
 STYLE_MAP = {"plot":{"marker":".", "markersize":7, "linewidth":1}}
 
-# for j in range(len(z_range)):
-#     for i in range(len(multipliers)):
-#         id_ = j*len(multipliers)+i
-#         # error_pairs = [(x, y) for x, y in zip(x_axis, list_of_list_of_errors[i])]
-#         error_pairs = list_of_list_of_errors[id_]
-#         arr1 = np.array(error_pairs)
-#         ax1.plot(np.array(x_axis),arr1,\
-#             label=str(round(multipliers[i],2))+", *z="+str(j),**STYLE_MAP["plot"])
+for j in range(len(z_range)):
+    for i in range(len(multipliers)):
+        id_ = j*len(multipliers)+i
+        # error_pairs = [(x, y) for x, y in zip(x_axis, list_of_list_of_errors[i])]
+        error_pairs = list_of_list_of_errors[id_]
+        arr1 = np.array(error_pairs)
+        ax1.plot(np.array(x_axis),arr1,\
+            label=str(round(multipliers[i],2))+", *z="+str(z_range[j]),**STYLE_MAP["plot"])
 
 
-for i in range(len(min_eigs)):
-    # error_pairs = [(x, y) for x, y in zip(x_axis, list_of_list_of_errors[i])]
-    error_pairs = list_of_list_of_errors[i]
-    arr1 = np.array(error_pairs)
-    ax1.plot(np.array(x_axis),arr1,\
-        label=min_eigs[i], **STYLE_MAP["plot"])
+# for i in range(len(min_eigs)):
+#     # error_pairs = [(x, y) for x, y in zip(x_axis, list_of_list_of_errors[i])]
+#     error_pairs = list_of_list_of_errors[i]
+#     arr1 = np.array(error_pairs)
+#     ax1.plot(np.array(x_axis),arr1,\
+#         label=min_eigs[i], **STYLE_MAP["plot"])
 
 colormap = plt.cm.cool
-colors = [colormap(i) for i in np.linspace(0, 1,len(ax1.lines))]
+colors1 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+colormap = plt.cm.copper
+colors2 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+colormap = plt.cm.autumn
+colors3 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+colormap = plt.cm.winter
+colors4 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
 
 for i,j in enumerate(ax1.lines):
-    j.set_color(colors[i])
+    if int(i / 3) == 0:
+        j.set_color(colors1[i%3])
+    if int(i / 3) == 1:
+        j.set_color(colors2[i%3])
+    if int(i / 3) == 2:
+        j.set_color(colors3[i%3])
+    if int(i / 3) == 3:
+        j.set_color(colors4[i%3])
 
 title_name = "STS-B"
 
-directory = "figures/comparison_range_eigenvalues/"
+directory = "figures/comparison_among_eigenvalues_and_z/"
 if not os.path.isdir(directory):
     os.mkdir(directory)
 path = os.path.join(directory, filename+".pdf")
@@ -188,37 +201,37 @@ plt.gcf().clear()
 
 
 ################################# EIGENVALUE PLOTS ###############################################################
-# path = os.path.join(directory, filename+"_eigenvalue.pdf")
+path = os.path.join(directory, filename+"_eigenvalue.pdf")
 
-# scale_ = 0.55
-# new_size = (scale_ * 10, scale_ * 8.5)
-# plt.gcf().set_size_inches(new_size)
+scale_ = 0.55
+new_size = (scale_ * 10, scale_ * 8.5)
+plt.gcf().set_size_inches(new_size)
 
-# fig1 = plt.figure()
-# ax1 = fig1.add_subplot(111)
+fig1 = plt.figure()
+ax1 = fig1.add_subplot(111)
 
-# plt.rc('axes', titlesize=13)
-# plt.rc('axes', labelsize=13)
-# plt.rc('xtick', labelsize=13)
-# plt.rc('ytick', labelsize=13)
-# plt.rc('legend', fontsize=11)
+plt.rc('axes', titlesize=13)
+plt.rc('axes', labelsize=13)
+plt.rc('xtick', labelsize=13)
+plt.rc('ytick', labelsize=13)
+plt.rc('legend', fontsize=11)
 
-# STYLE_MAP = {"plot":{"marker":".", "markersize":7, "linewidth":1}}
+STYLE_MAP = {"plot":{"marker":".", "markersize":7, "linewidth":1}}
 
-# eps=1e-16
-# min_eig_val = np.real(min(0, np.min(np.linalg.eigvals(similarity_matrix)))) - eps
-# min_eig_vec = min_eig_val*np.ones(len(x_axis))
-# arr1 = np.array(min_eig_vec)
+eps=1e-16
+min_eig_val = np.real(min(0, np.min(np.linalg.eigvals(similarity_matrix)))) - eps
+min_eig_vec = min_eig_val*np.ones(len(x_axis))
+arr1 = np.array(min_eig_vec)
 
-# ax1.plot(np.array(x_axis),arr1,label="True",**STYLE_MAP["plot"])
-# for j in range(len(z_range)):
-#     for i in range(len(multipliers)):
-#         id_ = j*len(multipliers)+i
-#         # error_pairs = [(x, y) for x, y in zip(x_axis, list_of_list_of_errors[i])]
-#         eigenvalues = list_of_min_eig_scaling[id_]
-#         arr1 = np.array(eigenvalues)
-#         ax1.plot(np.array(x_axis),arr1,\
-#             label=str(round(multipliers[i],2))+", *z="+str(j),**STYLE_MAP["plot"])
+ax1.plot(np.array(x_axis),arr1,label="True",**STYLE_MAP["plot"])
+for j in range(len(z_range)):
+    for i in range(len(multipliers)):
+        id_ = j*len(multipliers)+i
+        # error_pairs = [(x, y) for x, y in zip(x_axis, list_of_list_of_errors[i])]
+        eigenvalues = list_of_min_eig_scaling[id_]
+        arr1 = np.array(eigenvalues)
+        ax1.plot(np.array(x_axis),arr1,\
+            label=str(round(multipliers[i],2))+", *z="+str(z_range[j]),**STYLE_MAP["plot"])
 
 # colormap = plt.cm.copper
 # colors = [colormap(i) for i in np.linspace(0, 1,len(ax1.lines))]
@@ -226,16 +239,35 @@ plt.gcf().clear()
 # for i,j in enumerate(ax1.lines):
 #     j.set_color(colors[i])
 
-# plt.locator_params(axis='x', nbins=6)
-# # plt.ylim(bottom=0.0, top=2)
-# plt.xlabel("Number of landmark samples")
-# plt.ylabel("Average estimated eigenvalues")
-# plt.title(title_name, fontsize=13)
-# plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-# ax1.legend(loc='upper right')
-# plt.savefig(path)
-# # plt.show()
-# plt.gcf().clear()
+colormap = plt.cm.cool
+colors1 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+colormap = plt.cm.copper
+colors2 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+colormap = plt.cm.autumn
+colors3 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+colormap = plt.cm.winter
+colors4 = [colormap(i) for i in np.linspace(0, 1,int(len(ax1.lines)/len(z_range)))]
+
+for i,j in enumerate(ax1.lines):
+    if int(i / 3) == 0:
+        j.set_color(colors1[i%3])
+    if int(i / 3) == 1:
+        j.set_color(colors2[i%3])
+    if int(i / 3) == 2:
+        j.set_color(colors3[i%3])
+    if int(i / 3) == 3:
+        j.set_color(colors4[i%3])
+
+plt.locator_params(axis='x', nbins=6)
+# plt.ylim(bottom=0.0, top=2)
+plt.xlabel("Number of landmark samples")
+plt.ylabel("Average estimated eigenvalues")
+plt.title(title_name, fontsize=13)
+plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+ax1.legend(loc='upper right')
+plt.savefig(path)
+# plt.show()
+plt.gcf().clear()
 
 
 ######################################### Z Values ######################################

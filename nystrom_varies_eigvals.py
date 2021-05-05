@@ -116,7 +116,7 @@ for j in range(len(z_range)):
 #                 (similarity_matrix, k, return_type="error", min_eig_val=min_eigs[i])
 #             err += error
 #             min_eig_agg += min_eig
-#         error = err/np.float(runs_) - 0.4
+#         error = err/np.float(runs_)
 #         min_eig_scaling.append(min_eig_agg/np.float(runs_))
 #         list_of_errors.append(error)
 #         pass

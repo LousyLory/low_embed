@@ -42,7 +42,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=0,
     else:
         min_eig = min_eig_val
     # use the multiplier to multiply to the true eigenvalue estimate
-    if min_eig == 0:
+    if min_eig_val == 0:
         min_eig = mult*min_eig
     
     A = A - min_eig*np.eye(len(A))
@@ -61,8 +61,8 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "stsb"
-id_count = 750 #len(similarity_matrix) #1000
+filename = "mrpc"
+id_count = 450 #len(similarity_matrix) #1000
 # similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
 similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 # check for similar rows or columns
@@ -180,7 +180,7 @@ for i,j in enumerate(ax1.lines):
     if int(i / 3) == 3:
         j.set_color(colors4[i%3])
 
-title_name = "STS-B"
+title_name = "MRPC"
 
 directory = "figures/comparison_among_eigenvalues_and_z/"
 if not os.path.isdir(directory):
@@ -189,7 +189,7 @@ path = os.path.join(directory, filename+".pdf")
 
 
 plt.locator_params(axis='x', nbins=6)
-plt.ylim(bottom=0.0, top=1.35)
+plt.ylim(bottom=0.25, top=0.40)
 plt.xlabel("Number of landmark samples")
 plt.ylabel("Average approximation error")
 plt.title(title_name, fontsize=13)

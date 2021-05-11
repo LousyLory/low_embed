@@ -15,8 +15,8 @@ import os
 
 from recursiveNystrom import wrapper_for_recNystrom
 
-def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=0, \
-    z_scale=0, min_eig_val=0):
+def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=1.0, \
+    z_scale=0, min_eig_val=1):
     """
     compute eigen corrected nystrom approximations
     versions:
@@ -42,8 +42,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", mult=0,
     else:
         min_eig = min_eig_val
     # use the multiplier to multiply to the true eigenvalue estimate
-    if min_eig_val == 0:
-        min_eig = mult*min_eig
+    min_eig = mult*min_eig
     
     A = A - min_eig*np.eye(len(A))
     similarity_matrix_x = deepcopy(similarity_matrix)
@@ -61,10 +60,11 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "mrpc"
-id_count = 450 #len(similarity_matrix) #1000
-# similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
-similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
+# filename = "stsb"
+id_count = 500 #len(similarity_matrix) #1000
+similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/recipe_trainData.mat",\
+    version="v7.3")
+# similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 # check for similar rows or columns
 unique_rows, indices = np.unique(similarity_matrix, axis=0, return_index=True)
 similarity_matrix_O = similarity_matrix[indices][:, indices]
@@ -180,7 +180,7 @@ for i,j in enumerate(ax1.lines):
     if int(i / 3) == 3:
         j.set_color(colors4[i%3])
 
-title_name = "MRPC"
+title_name = "STS-B"
 
 directory = "figures/comparison_among_eigenvalues_and_z/"
 if not os.path.isdir(directory):
@@ -189,7 +189,7 @@ path = os.path.join(directory, filename+".pdf")
 
 
 plt.locator_params(axis='x', nbins=6)
-plt.ylim(bottom=0.25, top=0.40)
+plt.ylim(bottom=0.0, top=1.00)
 plt.xlabel("Number of landmark samples")
 plt.ylabel("Average approximation error")
 plt.title(title_name, fontsize=13)

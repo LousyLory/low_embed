@@ -13,6 +13,7 @@ from scipy.io import savemat
 import random
 import os
 
+from plotter import plot_errors
 from recursiveNystrom import wrapper_for_recNystrom
 
 def nystrom(similarity_matrix, k, min_eig=0.0, min_eig_mode=False, return_type="error", correct_outer=False):
@@ -84,7 +85,8 @@ def ratio_nystrom(similarity_matrix, k, min_eig=0.0, min_eig_mode=False, return_
                 / np.linalg.norm(similarity_matrix)
 
 
-def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling=False, mult=0):
+def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
+    scaling=False, mult=0, eig_mult=1):
     """
     compute eigen corrected nystrom approximations
     versions:
@@ -105,7 +107,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling
                             list_of_available_indices, large_k))
     Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
     min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
-    min_eig = 2.7*min_eig
+    min_eig = eig_mult*min_eig
     if scaling == True:
         min_eig = min_eig*np.float(len(similarity_matrix))/np.float(large_k)
 
@@ -210,10 +212,11 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "mrpc"
-id_count = 500 #len(similarity_matrix) #1000
-# similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
-similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
+filename = "ohsumed"
+# id_count = 200 #len(similarity_matrix) #1000
+similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/oshumed_K_set1.mat",\
+    version="v7.3")
+# similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 
 KS_corrected_error_list = []
 KS_ncorrected_error_list = []
@@ -241,6 +244,11 @@ similarity_matrix_O = similarity_matrix[indices][:, indices]
 # symmetrization
 similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
 # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
+id_count = 500#len(similarity_matrix-1)
+
+# if filename == "rte":
+#   similarity_matrix = 1-similarity_matrix
+#   similarity_matrix_O = 1-similarity_matrix_O
 
 ################# uniform sampling #####################################
 # eps=1e-16
@@ -291,11 +299,12 @@ for k in tqdm(range(10, id_count, 10)):
     err = 0
     min_eig_agg = 0
     for j in range(runs_):
-        error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, return_type="error")
+        error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, \
+            return_type="error", mult=2, eig_mult=1.5)
         err += error
         min_eig_agg += min_eig
     error = err/np.float(runs_)
-    # min_eig_nscaling.append(min_eig_agg/np.float(runs_))
+    min_eig_nscaling.append(min_eig_agg/np.float(runs_))
     nscaling_error_list.append(error)
     pass    
 
@@ -349,14 +358,14 @@ for k in tqdm(range(10, id_count, 10)):
 #     CUR_diff_error_list.append(error)
 #     pass
 
-# for k in tqdm(range(10, id_count, 10)):
-#     err = 0
-#     for j in range(runs_):
-#         error = CUR(similarity_matrix, k, same=True)
-#         err += error
-#     error = err/np.float(runs_)
-#     CUR_same_error_list.append(error)
-#     pass
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    for j in range(runs_):
+        error = CUR(similarity_matrix, k, same=True)
+        err += error
+    error = err/np.float(runs_)
+    CUR_same_error_list.append(error)
+    pass
 
 
 ################################ leverage scores #############################
@@ -381,127 +390,8 @@ for k in tqdm(range(10, id_count, 10)):
 
 #######################################################################
 # PLOTS
-x_axis = list(range(10, id_count, 10))
-
-plt.rc('axes', titlesize=13)
-plt.rc('axes', labelsize=13)
-plt.rc('xtick', labelsize=13)
-plt.rc('ytick', labelsize=13)
-plt.rc('legend', fontsize=11)
-
-STYLE_MAP = {"With true eigen correction": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'True eig', 'linewidth': 1},
-             "With estimated eigen corrected": {"color": "#EF4026",  "marker": ".", "markersize": 7, 'label': 'Estimated eig', 'linewidth': 1},
-             "With scaled estimated eigen correction": {"color": "#7B3294",  "marker": ".", "markersize": 7, 'label': 'Scaled estimated eig', 'linewidth': 1},
-             "Estimated eigenvalue": {"color": "#7B3294",  "marker": ".", "markersize": 7, 'label': 'Estimated Eig', 'linewidth': 1},
-             "Scaled estimated eigenvalue": {"color": "#9ACD32",  "marker": ".", "markersize": 7, 'label': 'Scaled estimated eig', 'linewidth': 1},
-             "True eigenvalue": {"color": "#EE82DE",  'label': 'True eig', 'linewidth': 1},
-             "KS corrected": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'KS corrected', 'linewidth': 1},
-             "KS not corrected": {"color": "#EF4026",  "marker": ".", "markersize": 7, 'label': 'KS not corrected', 'linewidth': 1},
-             "SKS corrected": {"color": "#EF4026",  "marker": ".", "markersize": 7, 'label': 'SKS corrected', 'linewidth': 1},
-             "SKS not corrected": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'SKS not corrected', 'linewidth': 1},
-             "SKS ratio corrected": {"color": "#EE82DE",  "marker": ".", "markersize": 7, 'label': 'SKS ratio corrected', 'linewidth': 1},
-             "CUR diff": {"color": "#EE82DE",  "marker": ".", "markersize": 7, 'label': 'CUR', 'linewidth': 1},
-             "CUR same": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'CUR same c and r', 'linewidth': 1},
-             "RLS KS not corrected": {"color": "#9ACD32",  "marker": ".", "markersize": 7, 'label': 'RLS KS not corrected', 'linewidth': 1},
-             "RLS KS corrected": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'RLS KS corrected', 'linewidth': 1},
-             "multiplied Z": {"color": "#4d9221",  "marker": ".", "markersize": 7, 'label': 'z = 10s', 'linewidth': 1},
-            }
-
-plt.gcf().clear()
-scale_ = 0.55
-new_size = (scale_ * 10, scale_ * 8.5)
-plt.gcf().set_size_inches(new_size)
-
-title_name = "MRPC"
-directory = "figures/comparison_debug/"
-if not os.path.isdir(directory):
-    os.mkdir(directory)
-path = os.path.join(directory, filename+".pdf")
-
-# KS_ncorrected_error_pairs = [(x, y) for x, y in zip(x_axis, KS_ncorrected_error_list)]
-# arr1 = np.array(KS_ncorrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["With true eigen correction"])
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["KS not corrected"])
-
-# KS_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, KS_corrected_error_list)]
-# arr1 = np.array(KS_corrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["KS corrected"])
-
-# scaling_error_pairs = [(x, y) for x, y in zip(x_axis, scaling_error_list)]
-# arr2 = np.array(scaling_error_pairs)
-# plt.plot(arr2[:, 0], arr2[:, 1], **STYLE_MAP["With scaled estimated eigen correction"])
-
-nscaling_error_pairs = [(x, y) for x, y in zip(x_axis, nscaling_error_list)]
-arr1 = np.array(nscaling_error_pairs)
-plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["With estimated eigen corrected"])
-
-# ZKZ_multiplier_error_pairs = [(x, y) for x, y in zip(x_axis, ZKZ_multiplier_error_list)]
-# arr1 = np.array(ZKZ_multiplier_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["multiplied Z"])
-
-# SKS_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, SKS_corrected_error_list)]
-# arr1 = np.array(SKS_corrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["SKS corrected"])
-
-# SKS_ncorrected_error_pairs = [(x, y) for x, y in zip(x_axis, SKS_ncorrected_error_list)]
-# arr1 = np.array(SKS_ncorrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["SKS not corrected"])
-
-# SKS_rcorrected_error_pairs = [(x, y) for x, y in zip(x_axis, SKS_rcorrected_error_list)]
-# arr1 = np.array(SKS_rcorrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["SKS ratio corrected"])
-
-# CUR_diff_error_pairs = [(x, y) for x, y in zip(x_axis, CUR_diff_error_list)]
-# arr1 = np.array(CUR_diff_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["CUR diff"])
-
-# CUR_same_error_pairs = [(x, y) for x, y in zip(x_axis, CUR_same_error_list)]
-# arr1 = np.array(CUR_same_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["CUR same"])
-
-# lev_ncorrected_error_pairs = [(x, y) for x, y in zip(x_axis, Lev_ncorrected_error_list)]
-# arr1 = np.array(lev_ncorrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["RLS KS not corrected"])
-
-# lev_corrected_error_pairs = [(x, y) for x, y in zip(x_axis, Lev_corrected_error_list)]
-# arr1 = np.array(lev_corrected_error_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["RLS KS corrected"])
-
-plt.locator_params(axis='x', nbins=6)
-# plt.ylim(bottom=0.0, top=1)
-plt.xlabel("Number of landmark samples")
-plt.ylabel("Average approximation error")
-plt.title(title_name, fontsize=13)
-plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.legend(loc='upper right')
-plt.savefig(path)
-# plt.show()
-plt.gcf().clear()
-
-
-################################### EIGENVALUE PLOTS ###############################################################
-# path = os.path.join(directory, filename+"_eigenvalue.pdf")
-
-# min_eig_vec = min_eig_val*np.ones(len(x_axis))
-# min_eig_pairs = [(x, y) for x, y in zip(x_axis, list(min_eig_vec))]
-# arr1 = np.array(min_eig_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["True eigenvalue"])
-
-# min_eig_scaling_pairs = [(x, y) for x, y in zip(x_axis, min_eig_scaling)]
-# arr1 = np.array(min_eig_scaling_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["Scaled estimated eigenvalue"])
-
-# min_eig_nscaling_pairs = [(x, y) for x, y in zip(x_axis, min_eig_nscaling)]
-# arr1 = np.array(min_eig_nscaling_pairs)
-# plt.plot(arr1[:, 0], arr1[:, 1], **STYLE_MAP["Estimated eigenvalue"])
-
-# plt.locator_params(axis='x', nbins=6)
-# # plt.ylim(bottom=0.0, top=2)
-# plt.xlabel("Number of landmark samples")
-# plt.ylabel("Average estimated eigenvalues")
-# plt.title(title_name, fontsize=13)
-# plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-# plt.legend(loc='upper right')
-# plt.savefig(path)
-# # plt.show()
-# plt.gcf().clear()
+plot_errors([nscaling_error_list, CUR_same_error_list], \
+    id_count= id_count, \
+    labels=["Nystrom", "CUR-same"], \
+    name="Ohsumed",\
+    save_path="comparison_with_CUR", y_lims=[0,1])

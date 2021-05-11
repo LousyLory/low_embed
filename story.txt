@@ -1,0 +1,6 @@
+1. We want to approximate non-PSD matrices in sublinear time
+2. One option is to CUR, which works fairly well and has theoretical guarantees
+3. If though our matrix is PSD or close PSD then Nystrom is much better (support with plots for e.g. twitter)
+4. However Nystrom often totally bombs on non-PSD matrices
+5. So we introduce regularized nystrom which does better
+6. you can set min_eig in many ways and just discuss them

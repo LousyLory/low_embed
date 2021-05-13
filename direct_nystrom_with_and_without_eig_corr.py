@@ -186,7 +186,7 @@ def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error", same=F
     psi = C[samples_r, :].T / np.sqrt(samp_qi*r)
     psi = psi.T
 
-    U = np.linalg.inv(rank_k_C.T @ rank_k_C)
+    U = np.linalg.pinv(rank_k_C.T @ rank_k_C)
     # i chose not to compute rank k reduction of U
     U = U @ psi.T
     
@@ -212,7 +212,7 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "ohsumed"
+filename = "twitter"
 # id_count = 200 #len(similarity_matrix) #1000
 similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/oshumed_K_set1.mat",\
     version="v7.3")
@@ -244,7 +244,7 @@ similarity_matrix_O = similarity_matrix[indices][:, indices]
 # symmetrization
 similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
 # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
-id_count = 500#len(similarity_matrix-1)
+id_count = len(similarity_matrix-1)
 
 # if filename == "rte":
 #   similarity_matrix = 1-similarity_matrix
@@ -393,5 +393,5 @@ for k in tqdm(range(10, id_count, 10)):
 plot_errors([nscaling_error_list, CUR_same_error_list], \
     id_count= id_count, \
     labels=["Nystrom", "CUR-same"], \
-    name="Ohsumed",\
-    save_path="comparison_with_CUR", y_lims=[0,1])
+    name="Twitter",\
+    save_path="comparison_with_CUR")#, y_lims=[0,1])

@@ -212,12 +212,17 @@ runs_ = 3
 """
 20ng2_new_K_set1.mat  oshumed_K_set1.mat  recipe_K_set1.mat  recipe_trainData.mat  twitter_K_set1.mat  twitter_set1.mat
 """
-filename = "twitter"
-# id_count = 200 #len(similarity_matrix) #1000
-similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/oshumed_K_set1.mat",\
-    version="v7.3")
+dataset = sys.argv[1]
+if dataset == "mrpc" or dataset == "rte":
+    filename = "../GYPSUM/"+dataset+"_predicts_0.npy"
+    filetype = "python"
+if filetype == "python":
+    similarity_matrix = read_file(filename)
+# similarity_matrix = read_mat_file(file_="WordMoversEmbeddings/mat_files/oshumed_K_set1.mat",\
+    # version="v7.3")
 # similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
 
+true_error = []
 KS_corrected_error_list = []
 KS_ncorrected_error_list = []
 
@@ -244,31 +249,33 @@ similarity_matrix_O = similarity_matrix[indices][:, indices]
 # symmetrization
 similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
 # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
-id_count = len(similarity_matrix-1)
+id_count = 500#len(similarity_matrix-1)
+print(dataset)
 
 # if filename == "rte":
 #   similarity_matrix = 1-similarity_matrix
 #   similarity_matrix_O = 1-similarity_matrix_O
 
 ################# uniform sampling #####################################
-# eps=1e-16
-# min_eig = min(0, np.min(np.linalg.eigvals(similarity_matrix))) - eps
-# for k in tqdm(range(10, id_count, 10)):
-#     err = 0
-#     for j in range(runs_):
-#         error = nystrom(similarity_matrix, k, min_eig_mode=True, min_eig=min_eig)
-#         err += error
-#     error = err/np.float(runs_)
-#     KS_ncorrected_error_list.append(error)
-#     pass
+print("original variations of nystrom")
+eps=1e-16
+min_eig = np.min(np.linalg.eigvals(similarity_matrix)) - eps
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    for j in range(runs_):
+        error = nystrom(similarity_matrix, k, min_eig_mode=True, min_eig=min_eig)
+        err += error
+    error = err/np.float(runs_)
+    KS_ncorrected_error_list.append(error)
+    pass
 
-#     err = 0
-#     for j in range(runs_):
-#         error = nystrom(similarity_matrix, k, min_eig_mode=True, min_eig=min_eig, correct_outer=True)
-#         err += error
-#     error = err/np.float(runs_)
-#     KS_corrected_error_list.append(error)
-#     pass    
+    err = 0
+    for j in range(runs_):
+        error = nystrom(similarity_matrix, k, min_eig_mode=False)
+        err += error
+    error = err/np.float(runs_)
+    true_error.append(error)
+    pass    
 
 ######################## eigen corrected uniform sampling ###################
 # eps=1e-16
@@ -295,6 +302,7 @@ id_count = len(similarity_matrix-1)
 #     scaling_error_list.append(error)
 #     pass
 
+print("our Nystrom")
 for k in tqdm(range(10, id_count, 10)):
     err = 0
     min_eig_agg = 0
@@ -358,6 +366,7 @@ for k in tqdm(range(10, id_count, 10)):
 #     CUR_diff_error_list.append(error)
 #     pass
 
+print("CUR")
 for k in tqdm(range(10, id_count, 10)):
     err = 0
     for j in range(runs_):
@@ -389,9 +398,15 @@ for k in tqdm(range(10, id_count, 10)):
 #     pass
 
 #######################################################################
-# PLOTS
-plot_errors([nscaling_error_list, CUR_same_error_list], \
-    id_count= id_count, \
-    labels=["Nystrom", "CUR-same"], \
-    name="Twitter",\
-    save_path="comparison_with_CUR")#, y_lims=[0,1])
+# SAVE
+import pickle
+with open(dataset+"_vals.pkl", "wb") as f:
+    pickle.dump([true_error, KS_ncorrected_error_list, \
+        nscaling_error_list, CUR_same_error_list], f)
+#######################################################################
+# # PLOTS
+# plot_errors([nscaling_error_list, CUR_same_error_list], \
+#     id_count= id_count, \
+#     labels=["Nystrom", "CUR-same"], \
+#     name="Twitter",\
+#     save_path="comparison_with_CUR")#, y_lims=[0,1])

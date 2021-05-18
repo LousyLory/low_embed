@@ -19,3 +19,4 @@ WordMoversEmbeddings/*.mat
 *.npy
 *.mat
 jax
+*.pkl

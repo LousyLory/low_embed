@@ -33,7 +33,7 @@ def read_fileGPU(file_="predicts_0.npy"):
         return torch.from_numpy(reshaped_preds).to(device)
 
 
-def read_mat_file(file_="twitter_K_set1.mat", version="default"):
+def read_mat_file(file_="twitter_K_set1.mat", version="default", return_type="mat_only"):
         """
         input: mat file
         output: NxN matrix of similarities among sentences
@@ -43,18 +43,20 @@ def read_mat_file(file_="twitter_K_set1.mat", version="default"):
             print("version: default")
             import scipy.io as sio
             mat = sio.loadmat(file_)
-            reshaped_preds = mat['trainData']
-            reshaped_preds = reshaped_preds[:, 1:]
+            reshaped_preds_full = mat['trainData']
+            reshaped_preds = reshaped_preds_full[:, 1:]
             pass
         if version == "v7.3":
             print("version: H5PY")
             import h5py
             f = h5py.File(file_, 'r')
-            reshaped_preds = f.get("trainData")
-            reshaped_preds = np.array(reshaped_preds)
-            reshaped_preds = reshaped_preds.T
+            reshaped_preds_full = f.get("trainData")
+            reshaped_preds_full = np.array(reshaped_preds_full)
+            reshaped_preds_full = reshaped_preds_full.T
             reshaped_preds = reshaped_preds[:, 1:]
             pass
+        if return_type == "all":
+            return reshaped_preds, reshaped_preds_full[:, 0]
         return reshaped_preds
 
 def read_mat_fileGPU(file_="twitter_K_set1.mat", version="default"):

@@ -132,7 +132,7 @@ def nystrom_with_samples(similarity_matrix, indices, samples, min_eig):
 
 
 def CUR(similarity_matrix, k, indices=None, \
-    eps=1e-3, delta=1e-14, return_type="error", same=False):
+    eps=1e-3, delta=1e-14, return_type="error", same=True):
     """
     implementation of Linear time CUR algorithm of Drineas2006 et. al.
 
@@ -179,8 +179,8 @@ def CUR(similarity_matrix, k, indices=None, \
         pj = np.ones(d).astype(float) / float(d)
         qi = np.ones(n).astype(float) / float(n)
     else:
-        pj = np.ones(indices).astype(float) / float(indices)
-        qi = np.ones(indices).astype(float) / float(indices)
+        pj = np.ones(len(indices)).astype(float) / float(len(indices))
+        qi = np.ones(len(indices)).astype(float) / float(len(indices))
 
     # choose samples
     if indices is not None:
@@ -193,16 +193,16 @@ def CUR(similarity_matrix, k, indices=None, \
         samples_r = np.random.choice(range(n), r, replace=False, p = qi)
 
     # grab rows and columns and scale with respective probability
-    samp_pj = pj[samples_c]
-    samp_qi = qi[samples_r]
+    samp_pj = pj[0:len(samples_c)]#pj[samples_c]
+    samp_qi = qi[0:len(samples_r)]#qi[samples_r]
     if indices is not None:
-        C = similarity_matrix[indices, samples_c] / np.sqrt(samp_pj*c)
+        C = similarity_matrix[indices][:, samples_c] / np.sqrt(samp_pj*c)
     else:
         C = similarity_matrix[:, samples_c] / np.sqrt(samp_pj*c)
     rank_k_C = C
     # modification works only because we assume similarity matrix is symmetric
     if indices is not None:
-        R = similarity_matrix[indices, samples_r] / np.sqrt(samp_qi*r)   
+        R = similarity_matrix[indices][:, samples_r] / np.sqrt(samp_qi*r)   
     else:
         R = similarity_matrix[:, samples_r] / np.sqrt(samp_qi*r)
     R = R.T
@@ -224,8 +224,8 @@ def CUR(similarity_matrix, k, indices=None, \
 
 
 def CUR_with_samples(similarity_matrix, indices, samples):
-    pj = np.ones(indices).astype(float) / float(indices)
-    qi = np.ones(indices).astype(float) / float(indices)
+    pj = np.ones(len(indices)).astype(float) / float(len(indices))
+    qi = np.ones(len(indices)).astype(float) / float(len(indices))
 
     C = similarity_matrix[indices, samples] / np.sqrt(pj * len(samples))
     psi = similarity_matrix[samples, samples] / np.sqrt(qi*len(samples))

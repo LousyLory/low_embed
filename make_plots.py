@@ -27,7 +27,7 @@ for file_ in files:
     min_y = 0.0
     max_y = 1.0
 
-    if nom == "news" or nom == "mrpc":
+    if nom == "news" or nom == "mrpc" or nom == "recipe":
         max_y = 2.0
 
     plot_errors([true_nystrom, min_eig_nystrom, our_nystrom, CUR], \

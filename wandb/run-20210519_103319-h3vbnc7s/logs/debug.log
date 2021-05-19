@@ -1,0 +1,24 @@
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_setup.py:_flush():69] setting env: {'entity': 'archan', 'project': 'nystrom_wme_twitter', 'sweep_id': 'wk0s5c96', 'root_dir': 'E:\\Research\\low_embed', 'run_id': 'h3vbnc7s', 'sweep_param_path': 'E:\\Research\\low_embed\\wandb\\sweep-wk0s5c96\\config-h3vbnc7s.yaml'}
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_init.py:_log_setup():336] Logging user logs to E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\logs\debug.log
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_init.py:_log_setup():337] Logging internal logs to E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\logs\debug-internal.log
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_init.py:init():369] calling init triggers
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_init.py:init():374] wandb.init called with sweep_config: {'dataset': 'twitter', 'gamma': 1.4040064845312665, 'lambda_inverse': 100000000, 'method': 'nystrom', 'sample_size': 500}
+config: {}
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [wandb_init.py:init():418] starting backend
+2021-05-19 10:33:19,739 INFO    MainThread:24912 [backend.py:_multiprocessing_setup():70] multiprocessing start_methods=spawn, using: spawn
+2021-05-19 10:33:19,742 INFO    MainThread:24912 [backend.py:ensure_launched():132] starting backend process...
+2021-05-19 10:33:19,793 INFO    MainThread:24912 [backend.py:ensure_launched():136] started backend process with pid: 24416
+2021-05-19 10:33:19,794 INFO    MainThread:24912 [wandb_init.py:init():423] backend started and connected
+2021-05-19 10:33:19,794 INFO    MainThread:24912 [wandb_run.py:_config_callback():787] config_cb None None {'dataset': 'twitter', 'gamma': 1.4040064845312665, 'lambda_inverse': 100000000, 'method': 'nystrom', 'sample_size': 500}
+2021-05-19 10:33:19,794 INFO    MainThread:24912 [wandb_init.py:init():465] updated telemetry
+2021-05-19 10:33:19,794 INFO    MainThread:24912 [wandb_init.py:init():484] communicating current version
+2021-05-19 10:33:20,738 INFO    MainThread:24912 [wandb_init.py:init():489] got version response 
+2021-05-19 10:33:20,738 INFO    MainThread:24912 [wandb_init.py:init():497] communicating run to backend with 30 second timeout
+2021-05-19 10:33:20,928 INFO    MainThread:24912 [wandb_init.py:init():522] starting run threads in backend
+2021-05-19 10:33:22,353 INFO    MainThread:24912 [wandb_run.py:_console_start():1565] atexit reg
+2021-05-19 10:33:22,353 INFO    MainThread:24912 [wandb_run.py:_redirect():1412] redirect: SettingsConsole.WRAP
+2021-05-19 10:33:22,354 INFO    MainThread:24912 [wandb_run.py:_redirect():1455] Wrapping output streams.
+2021-05-19 10:33:22,354 INFO    MainThread:24912 [wandb_run.py:_redirect():1479] Redirects installed.
+2021-05-19 10:33:22,354 INFO    MainThread:24912 [wandb_init.py:init():546] run started, returning control to user process
+2021-05-19 10:33:22,358 INFO    MainThread:24912 [wandb_run.py:_config_callback():787] config_cb None None {'?': False, 'alsologtostderr': False, 'help': False, 'helpfull': False, 'helpshort': False, 'helpxml': False, 'log_dir': '', 'logger_levels': {}, 'logtostderr': False, 'mode': 'train', 'only_check_args': False, 'pdb': False, 'pdb_post_mortem': False, 'profile_file': None, 'run_with_pdb': False, 'run_with_profiling': False, 'runs': 3, 'showprefixforinfo': True, 'stderrthreshold': 'fatal', 'use_cprofile_for_profiling': True, 'v': 0, 'verbosity': 0}

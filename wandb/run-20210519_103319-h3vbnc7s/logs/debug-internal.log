@@ -1,0 +1,54 @@
+2021-05-19 10:33:20,654 INFO    MainThread:24416 [internal.py:wandb_internal():88] W&B internal server running at pid: 24416, started at: 2021-05-19 10:33:20.648459
+2021-05-19 10:33:20,655 INFO    WriterThread:24416 [datastore.py:open_for_write():77] open: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\run-h3vbnc7s.wandb
+2021-05-19 10:33:20,655 DEBUG   HandlerThread:24416 [handler.py:handle_request():121] handle_request: check_version
+2021-05-19 10:33:20,662 DEBUG   SenderThread:24416 [sender.py:send():176] send: header
+2021-05-19 10:33:20,662 DEBUG   SenderThread:24416 [sender.py:send_request():186] send_request: check_version
+2021-05-19 10:33:20,739 DEBUG   SenderThread:24416 [sender.py:send():176] send: run
+2021-05-19 10:33:20,928 INFO    SenderThread:24416 [dir_watcher.py:__init__():168] watching files in: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files
+2021-05-19 10:33:20,928 INFO    SenderThread:24416 [sender.py:_start_run_threads():696] run started: h3vbnc7s with start time 1621434799
+2021-05-19 10:33:20,928 DEBUG   SenderThread:24416 [sender.py:send():176] send: summary
+2021-05-19 10:33:20,928 INFO    SenderThread:24416 [sender.py:_save_file():821] saving file wandb-summary.json with policy end
+2021-05-19 10:33:20,929 DEBUG   HandlerThread:24416 [handler.py:handle_request():121] handle_request: run_start
+2021-05-19 10:33:20,939 DEBUG   HandlerThread:24416 [meta.py:__init__():39] meta init
+2021-05-19 10:33:20,939 DEBUG   HandlerThread:24416 [meta.py:__init__():53] meta init done
+2021-05-19 10:33:20,939 DEBUG   HandlerThread:24416 [meta.py:probe():210] probe
+2021-05-19 10:33:20,951 DEBUG   HandlerThread:24416 [meta.py:_setup_git():200] setup git
+2021-05-19 10:33:21,004 DEBUG   HandlerThread:24416 [meta.py:_setup_git():207] setup git done
+2021-05-19 10:33:21,004 DEBUG   HandlerThread:24416 [meta.py:_save_pip():57] save pip
+2021-05-19 10:33:21,008 DEBUG   HandlerThread:24416 [meta.py:_save_pip():71] save pip done
+2021-05-19 10:33:21,008 DEBUG   HandlerThread:24416 [meta.py:_save_conda():78] save conda
+2021-05-19 10:33:21,938 INFO    Thread-12 :24416 [dir_watcher.py:_on_file_created():216] file/dir created: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\requirements.txt
+2021-05-19 10:33:21,938 INFO    Thread-12 :24416 [dir_watcher.py:_on_file_created():216] file/dir created: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\wandb-summary.json
+2021-05-19 10:33:21,938 INFO    Thread-12 :24416 [dir_watcher.py:_on_file_created():216] file/dir created: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\conda-environment.yaml
+2021-05-19 10:33:22,298 DEBUG   HandlerThread:24416 [meta.py:_save_conda():86] save conda done
+2021-05-19 10:33:22,298 DEBUG   HandlerThread:24416 [meta.py:probe():252] probe done
+2021-05-19 10:33:22,388 DEBUG   SenderThread:24416 [sender.py:send():176] send: files
+2021-05-19 10:33:22,389 DEBUG   HandlerThread:24416 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-19 10:33:22,389 INFO    SenderThread:24416 [sender.py:_save_file():821] saving file wandb-metadata.json with policy now
+2021-05-19 10:33:22,390 DEBUG   SenderThread:24416 [sender.py:send_request():186] send_request: stop_status
+2021-05-19 10:33:22,518 DEBUG   SenderThread:24416 [sender.py:send():176] send: config
+2021-05-19 10:33:22,879 INFO    Thread-17 :24416 [upload_job.py:push():133] Uploaded file C:\Users\Archan\AppData\Local\Temp\tmp3dqrzws5wandb\4g0xlz3q-wandb-metadata.json
+2021-05-19 10:33:22,943 INFO    Thread-12 :24416 [dir_watcher.py:_on_file_created():216] file/dir created: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\output.log
+2021-05-19 10:33:22,943 INFO    Thread-12 :24416 [dir_watcher.py:_on_file_created():216] file/dir created: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\wandb-metadata.json
+2021-05-19 10:33:23,954 INFO    Thread-12 :24416 [dir_watcher.py:_on_file_modified():229] file/dir modified: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\config.yaml
+2021-05-19 10:33:37,533 DEBUG   HandlerThread:24416 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-19 10:33:37,533 DEBUG   SenderThread:24416 [sender.py:send_request():186] send_request: stop_status
+2021-05-19 10:33:45,843 WARNING MainThread:24416 [internal.py:is_dead():366] Internal process exiting, parent pid 24912 disappeared
+2021-05-19 10:33:45,843 ERROR   MainThread:24416 [internal.py:wandb_internal():143] Internal process shutdown.
+2021-05-19 10:33:46,747 INFO    SenderThread:24416 [sender.py:finish():925] shutting down sender
+2021-05-19 10:33:46,747 INFO    SenderThread:24416 [dir_watcher.py:finish():282] shutting down directory watcher
+2021-05-19 10:33:46,747 INFO    HandlerThread:24416 [handler.py:finish():632] shutting down handler
+2021-05-19 10:33:46,778 INFO    WriterThread:24416 [datastore.py:close():258] close: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\run-h3vbnc7s.wandb
+2021-05-19 10:33:47,139 INFO    SenderThread:24416 [dir_watcher.py:finish():312] scan: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files
+2021-05-19 10:33:47,139 INFO    SenderThread:24416 [dir_watcher.py:finish():318] scan save: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\conda-environment.yaml conda-environment.yaml
+2021-05-19 10:33:47,139 INFO    SenderThread:24416 [dir_watcher.py:finish():318] scan save: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\config.yaml config.yaml
+2021-05-19 10:33:47,140 INFO    SenderThread:24416 [dir_watcher.py:finish():318] scan save: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\output.log output.log
+2021-05-19 10:33:47,140 INFO    SenderThread:24416 [dir_watcher.py:finish():318] scan save: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\requirements.txt requirements.txt
+2021-05-19 10:33:47,142 INFO    SenderThread:24416 [dir_watcher.py:finish():318] scan save: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\wandb-metadata.json wandb-metadata.json
+2021-05-19 10:33:47,142 INFO    SenderThread:24416 [dir_watcher.py:finish():318] scan save: E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\wandb-summary.json wandb-summary.json
+2021-05-19 10:33:47,144 INFO    SenderThread:24416 [file_pusher.py:finish():176] shutting down file pusher
+2021-05-19 10:33:47,144 INFO    SenderThread:24416 [file_pusher.py:join():181] waiting for file pusher
+2021-05-19 10:33:47,556 INFO    Thread-19 :24416 [upload_job.py:push():133] Uploaded file E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\requirements.txt
+2021-05-19 10:33:47,586 INFO    Thread-20 :24416 [upload_job.py:push():133] Uploaded file E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\wandb-summary.json
+2021-05-19 10:33:47,586 INFO    Thread-18 :24416 [upload_job.py:push():133] Uploaded file E:\Research\low_embed\wandb\run-20210519_103319-h3vbnc7s\files\config.yaml
+2021-05-19 10:33:48,229 INFO    MainThread:24416 [internal.py:handle_exit():78] Internal process exited

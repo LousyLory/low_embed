@@ -1,0 +1,99 @@
+wandb_version: 1
+
+'?':
+  desc: null
+  value: false
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.10.30
+    framework: sklearn
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.8.5
+    t:
+      1:
+      - 5
+      4: 3.8.5
+      5: 0.10.30
+      8:
+      - 3
+      - 5
+alsologtostderr:
+  desc: null
+  value: false
+dataset:
+  desc: null
+  value: twitter
+gamma:
+  desc: null
+  value: 1.4462345606074831
+help:
+  desc: null
+  value: false
+helpfull:
+  desc: null
+  value: false
+helpshort:
+  desc: null
+  value: false
+helpxml:
+  desc: null
+  value: false
+lambda_inverse:
+  desc: null
+  value: 10000000000
+log_dir:
+  desc: null
+  value: ''
+logger_levels:
+  desc: null
+  value: {}
+logtostderr:
+  desc: null
+  value: false
+method:
+  desc: null
+  value: nystrom
+mode:
+  desc: null
+  value: train
+only_check_args:
+  desc: null
+  value: false
+pdb:
+  desc: null
+  value: false
+pdb_post_mortem:
+  desc: null
+  value: false
+profile_file:
+  desc: null
+  value: null
+run_with_pdb:
+  desc: null
+  value: false
+run_with_profiling:
+  desc: null
+  value: false
+runs:
+  desc: null
+  value: 3
+sample_size:
+  desc: null
+  value: 500
+showprefixforinfo:
+  desc: null
+  value: true
+stderrthreshold:
+  desc: null
+  value: fatal
+use_cprofile_for_profiling:
+  desc: null
+  value: true
+v:
+  desc: null
+  value: 0
+verbosity:
+  desc: null
+  value: 0

@@ -1,0 +1,12 @@
+wandb_version: 1
+
+dataset:
+  value: twitter
+gamma:
+  value: 0.3353895013746481
+lambda_inverse:
+  value: 5000
+method:
+  value: nystrom
+sample_size:
+  value: 500

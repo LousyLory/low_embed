@@ -17,11 +17,11 @@ from sklearn.model_selection import StratifiedKFold
 from absl import flags
 from absl import logging
 from absl import app
-import wandb
+#import wandb
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string('dataset', "twitter", "twitter or ohsumed or news or recipe")
-flags.DEFINE_string('method', "nystrom", "method for approximation")
+flags.DEFINE_string('method', "CUR", "method for approximation")
 flags.DEFINE_float('lambda_inverse', 1e4, "lambda inverse value")
 flags.DEFINE_float('gamma', 0.1, "exp(-dsr/gamma)")
 flags.DEFINE_integer('sample_size', 1000, "number of samples to be considered")
@@ -118,16 +118,16 @@ def train_all(X, Y, config):
         # validation accuracy
         valAccu.append(val_accuracy[0])
 
-    wandb.log({"validation_mean":np.mean(valAccu), \
-        "validation_std":np.std(valAccu)})
-    logging.info("validation_accuracy: %s", np.mean(valAccu))
+    #wandb.log({"validation_mean":np.mean(valAccu), \
+    #    "validation_std":np.std(valAccu)})
+    #logging.info("validation_accuracy: %s", np.mean(valAccu))
     return None
 
 # main
 def main(argv):
-    wandb.init(project="WME-Nyst and CUR")
-    wandb.config.update(flags.FLAGS)
-    logging.info('Running with args %s', str(argv))
+    #wandb.init(project="WME-Nyst and CUR")
+    #wandb.config.update(flags.FLAGS)
+    #logging.info('Running with args %s', str(argv))
 
     # get dataset
     dataset = FLAGS.dataset
@@ -150,7 +150,7 @@ def main(argv):
         return None
 
     # get EMD matrix
-    similarity_matrix, labels = read_mat_file(file_="/mnt/nfs/work1/elm/ray/"+filename,\
+    similarity_matrix, labels = read_mat_file(file_="./WordMoversEmbeddings/mat_files/"+filename,\
                                       version=version, return_type="all")
 
     # set hyper-parameters

@@ -1,0 +1,72 @@
+2021-05-19 10:28:57,327 INFO    MainThread:8336 [wandb_setup.py:_flush():69] setting env: {'entity': 'archan', 'project': 'nystrom_wme_twitter', 'sweep_id': 'wk0s5c96', 'root_dir': 'E:\\Research\\low_embed', 'run_id': 's75bf9mq', 'sweep_param_path': 'E:\\Research\\low_embed\\wandb\\sweep-wk0s5c96\\config-s75bf9mq.yaml'}
+2021-05-19 10:28:57,327 INFO    MainThread:8336 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-05-19 10:28:57,327 INFO    MainThread:8336 [wandb_init.py:_log_setup():336] Logging user logs to E:\Research\low_embed\wandb\run-20210519_102857-s75bf9mq\logs\debug.log
+2021-05-19 10:28:57,327 INFO    MainThread:8336 [wandb_init.py:_log_setup():337] Logging internal logs to E:\Research\low_embed\wandb\run-20210519_102857-s75bf9mq\logs\debug-internal.log
+2021-05-19 10:28:57,327 INFO    MainThread:8336 [wandb_init.py:init():369] calling init triggers
+2021-05-19 10:28:57,327 INFO    MainThread:8336 [wandb_init.py:init():374] wandb.init called with sweep_config: {'dataset': 'twitter', 'gamma': 0.3729865755869589, 'lambda_inverse': 50000, 'method': 'nystrom', 'sample_size': 500}
+config: {}
+2021-05-19 10:28:57,328 INFO    MainThread:8336 [wandb_init.py:init():418] starting backend
+2021-05-19 10:28:57,328 INFO    MainThread:8336 [backend.py:_multiprocessing_setup():70] multiprocessing start_methods=spawn, using: spawn
+2021-05-19 10:28:57,330 INFO    MainThread:8336 [backend.py:ensure_launched():132] starting backend process...
+2021-05-19 10:28:57,380 INFO    MainThread:8336 [backend.py:ensure_launched():136] started backend process with pid: 16524
+2021-05-19 10:28:57,380 INFO    MainThread:8336 [wandb_init.py:init():423] backend started and connected
+2021-05-19 10:28:57,381 INFO    MainThread:8336 [wandb_run.py:_config_callback():787] config_cb None None {'dataset': 'twitter', 'gamma': 0.3729865755869589, 'lambda_inverse': 50000, 'method': 'nystrom', 'sample_size': 500}
+2021-05-19 10:28:57,381 INFO    MainThread:8336 [wandb_init.py:init():465] updated telemetry
+2021-05-19 10:28:57,381 INFO    MainThread:8336 [wandb_init.py:init():484] communicating current version
+2021-05-19 10:28:58,309 INFO    MainThread:8336 [wandb_init.py:init():489] got version response 
+2021-05-19 10:28:58,309 INFO    MainThread:8336 [wandb_init.py:init():497] communicating run to backend with 30 second timeout
+2021-05-19 10:28:58,518 INFO    MainThread:8336 [wandb_init.py:init():522] starting run threads in backend
+2021-05-19 10:28:59,927 INFO    MainThread:8336 [wandb_run.py:_console_start():1565] atexit reg
+2021-05-19 10:28:59,927 INFO    MainThread:8336 [wandb_run.py:_redirect():1412] redirect: SettingsConsole.WRAP
+2021-05-19 10:28:59,927 INFO    MainThread:8336 [wandb_run.py:_redirect():1455] Wrapping output streams.
+2021-05-19 10:28:59,927 INFO    MainThread:8336 [wandb_run.py:_redirect():1479] Redirects installed.
+2021-05-19 10:28:59,927 INFO    MainThread:8336 [wandb_init.py:init():546] run started, returning control to user process
+2021-05-19 10:28:59,931 INFO    MainThread:8336 [wandb_run.py:_config_callback():787] config_cb None None {'?': False, 'alsologtostderr': False, 'help': False, 'helpfull': False, 'helpshort': False, 'helpxml': False, 'log_dir': '', 'logger_levels': {}, 'logtostderr': False, 'mode': 'train', 'only_check_args': False, 'pdb': False, 'pdb_post_mortem': False, 'profile_file': None, 'run_with_pdb': False, 'run_with_profiling': False, 'runs': 3, 'showprefixforinfo': True, 'stderrthreshold': 'fatal', 'use_cprofile_for_profiling': True, 'v': 0, 'verbosity': 0}
+2021-05-19 10:29:35,803 INFO    MainThread:8336 [wandb_run.py:_atexit_cleanup():1535] got exitcode: 0
+2021-05-19 10:29:35,803 INFO    MainThread:8336 [wandb_run.py:_restore():1507] restore
+2021-05-19 10:29:35,806 INFO    MainThread:8336 [wandb_run.py:_wait_for_finish():1657] got exit ret: file_counts {
+  wandb_count: 1
+}
+pusher_stats {
+  uploaded_bytes: 892
+  total_bytes: 892
+}
+
+2021-05-19 10:29:36,040 INFO    MainThread:8336 [wandb_run.py:_wait_for_finish():1657] got exit ret: file_counts {
+  wandb_count: 1
+}
+pusher_stats {
+  uploaded_bytes: 892
+  total_bytes: 892
+}
+
+2021-05-19 10:29:36,835 INFO    MainThread:8336 [wandb_run.py:_wait_for_finish():1657] got exit ret: file_counts {
+  wandb_count: 4
+}
+pusher_stats {
+  uploaded_bytes: 892
+  total_bytes: 7958
+}
+
+2021-05-19 10:29:37,931 INFO    MainThread:8336 [wandb_run.py:_wait_for_finish():1657] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 8089
+  total_bytes: 8089
+}
+
+2021-05-19 10:29:38,047 INFO    MainThread:8336 [wandb_run.py:_wait_for_finish():1657] got exit ret: done: true
+exit_result {
+}
+file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 8089
+  total_bytes: 8089
+}
+
+2021-05-19 10:29:39,157 INFO    MainThread:8336 [wandb_run.py:_show_summary():1812] rendering summary
+2021-05-19 10:29:39,159 INFO    MainThread:8336 [wandb_run.py:_show_history():1850] rendering history
+2021-05-19 10:29:39,160 INFO    MainThread:8336 [wandb_run.py:_show_files():1879] logging synced files

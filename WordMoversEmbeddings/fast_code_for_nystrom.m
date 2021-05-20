@@ -97,7 +97,9 @@ max_samples_number = 1500;
                 rng('default')
                 timer_start = tic;
                 % get Nystrom features
-                [trainFeaX_random] = WMD_Nystrom_Once(X, gamma, sample_size, rearranged_chosen_samples, c);
+                % [trainFeaX_random] = WMD_Nystrom_Once(X, gamma, sample_size, rearranged_chosen_samples, c);
+                % get CUR features
+                [trainFeaX_random] = WMD_CUR_Once(X, gamma, sample_size, rearranged_chosen_samples);
                 %fprintf('Finish computing trainFeaX \n');
                 telapsed_fea_gen = toc(timer_start);
                 %==================================================================

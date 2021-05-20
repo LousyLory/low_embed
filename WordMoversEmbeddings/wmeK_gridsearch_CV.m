@@ -73,10 +73,12 @@ for jjj = 1:length(filename_list)
     info.sample_size_Hist = [];
     info.lambda_invHist = [];
     for jj = 1:length(sample_size_list)
-    for c_for_eig = 0.2:0.2:1.8
+%     for c_for_eig = 0.2:0.2:1.8
+    for c_for_eig = 1:1
     for j = 1:length(gamma_list)
         %==================================================================
-        R = sample_size_list(jj);
+%         R = sample_size_list(jj);
+        R = 1;
         sample_size = sample_size_list(jj)
         %==================================================================
         % DMax = DMax_list(jj)
@@ -111,8 +113,11 @@ for jjj = 1:length(filename_list)
         samples = [];
         sample_weights = [];
         % uncomment for wmd nystrom
-        [trainFeaX_random, samples, sample_weights, train_emd_time] = WMD_Nystrom(X, weight_X, ...
-                                      gamma, sample_size, R, samples, sample_weights, c_for_eig);
+%         [trainFeaX_random, samples, sample_weights, train_emd_time] = WMD_Nystrom(X, weight_X, ...
+%                                       gamma, sample_size, R, samples, sample_weights, c_for_eig);
+        % uncomment for wmd CUR
+        [trainFeaX_random, samples, sample_weights, train_emd_time] = WMD_CUR(X, weight_X, ...
+                                      gamma, sample_size, samples, sample_weights);
         % uncomment for wmd optimal
 %         [trainFeaX_random, train_emd_time] = wmd_dist(X,weight_X,...
 %                                                 X,weight_X,gamma);

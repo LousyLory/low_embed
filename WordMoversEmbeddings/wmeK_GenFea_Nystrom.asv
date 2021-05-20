@@ -56,9 +56,9 @@ function [Train,Test,Runtime] = wmeK_GenFea_Nystrom(Data,...
             % use uniform distribution
             samples = [];
             sample_weights = [];
-            [trainFeaX_random, samples, sample_weights, train_emd_time] = WMD_CUR(train_X, train_weight_X, gamma, sample_size, samples, sample_weights);
+            [trainFeaX_random, samples, sample_weights, train_emd_time] = WMD_Nystrom(train_X, train_weight_X, gamma, sample_size, R, samples, sample_weights, c_for_eig);
             fprintf('Finish computing trainFeaX \n');
-            [testFeaX_random, samples, sample_weights, test_emd_time] = WMD_CUR(test_X, test_weight_X, gamma, sample_size, samples, sample_weights);
+            [testFeaX_random, samples, sample_weights, test_emd_time] = WMD_Nystrom(test_X, test_weight_X, gamma, sample_size, R, samples, sample_weights, c_for_eig);
             fprintf('Finish computing testFeaX \n');
         end
     end

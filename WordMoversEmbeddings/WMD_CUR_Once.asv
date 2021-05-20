@@ -1,0 +1,27 @@
+% Code to compute nystrom on top of WMD features
+% reuses the WMD library made available by  Lingfei Wu
+%
+% Author: Archan Ray
+% Date: 
+
+function[mapped_feats] = WMD_CUR_Once(X, gamma, sample_size, chosen_samples, c)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    n = size(X,1);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % get samples to be considered
+    available_samples = [1:length(chosen_samples)];
+    samples_considered = datasample(available_samples, sample_size, 'Replace',false);
+    samples_considered_indices = chosen_samples(1, samples_considered);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % subsample the original matrix
+    new_X = X.^gamma;
+    reduced_X = new_X(samples_considered_indices, samples_considered);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % compute the approximate features as Kz
+    Ks = new_X(:, samples_considered);
+    sKs = reduced_X - minEigI(samples_considered, samples_considered);
+    isKs = inv(sKs);
+    mapped_feats = Ks * isKs^0.5;
+end

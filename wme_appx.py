@@ -25,59 +25,37 @@ flags.DEFINE_string('method', "CUR", "method for approximation")
 flags.DEFINE_float('lambda_inverse', 1e4, "lambda inverse value")
 flags.DEFINE_float('gamma', 0.1, "exp(-dsr/gamma)")
 flags.DEFINE_integer('sample_size', 1000, "number of samples to be considered")
-flags.DEFINE_integer('runs', 3, "runs for compouting the nystrom approximation")
 
 flags.DEFINE_string('mode', "train", "run mode")
 
 logging.set_verbosity(logging.INFO)
 
-def get_feat(X, indices, runs, k, gamma, approximator, mode="train", \
+def get_feat(X, indices, k, gamma, approximator, mode="train", \
     samples=None, min_eig=None):
     if approximator == "nystrom":
         if mode == "train":
-            KS_agg = np.zeros((len(indices), k))
-            SKS_agg = np.zeros((k, k))
-            for r in range(runs):
-                KS, SKS, sample_indices, min_eig = nystrom(X, k, \
+            KS, SKS, sample_indices, min_eig = nystrom(X, k, \
                                   return_type="decomposed", \
-                                  mult=2, eig_mult=1.5, indices=list(indices))
-                KS_agg += KS
-                SKS_agg += SKS
-            KS_agg /= float(runs)
-            SKS_agg /= float(runs)
-            KS_agg = gamma**np.exp(KS_agg)
-            SKS_agg = gamma**np.exp(SKS_agg)
-            feats = KS_agg @ sqrtm(np.linalg.inv(SKS_agg))
+                                  mult=2, eig_mult=1.5, indices=list(indices), \
+                                  gamma=gamma)
+            feats = KS @ sqrtm(np.linalg.inv(SKS))
             return feats, sample_indices, min_eig
         if mode == "val":
-            KS, SKS = nystrom_test(X, indices, samples, min_eig)
-            KS = gamma**np.exp(KS)
-            SKS = gamma**np.exp(SKS)
+            KS, SKS = nystrom_test(X, indices, samples, min_eig, gamma=gamma)
             feats = KS @ sqrtm(np.linalg.inv(SKS))
             return feats
 
     if approximator == "CUR":
         if mode == "train":
-            C_agg = np.zeros((len(indices), k))
-            U_agg = np.zeros((k, k))
-            for r in range(runs):
-                C, U, sample_indices = CUR(X,\
-                                           k,\
-                                           indices=list(indices),\
-                                           return_type="decomposed",\
-                                           )
-                C_agg += C
-                U_agg += U
-            C_agg /= float(runs)
-            U_agg /= float(runs)
-            C_agg = gamma**np.exp(C_agg)
-            U_agg = gamma**np.exp(U_agg)
-            feats = C_agg @ sqrtm(U_agg)
+            C, U, sample_indices = CUR(X,\
+                                       k,\
+                                       indices=list(indices),\
+                                       return_type="decomposed",\
+                                       gamma=gamma)
+            feats = C @ sqrtm(U)
             return feats, sample_indices, None
         if mode == "val":
-            C, U = CUR_test(X, indices, sample_indices=samples)
-            C = gamma**np.exp(C)
-            U = gamma**np.exp(U)
+            C, U = CUR_test(X, indices, sample_indices=samples, gamma=gamma)
             feats = C @ sqrtm(C)
             return feats
 
@@ -150,8 +128,9 @@ def main(argv):
         return None
 
     # get EMD matrix
-    similarity_matrix, labels = read_mat_file(file_="./WordMoversEmbeddings/mat_files/"+filename,\
-                                      version=version, return_type="all")
+    similarity_matrix, labels = read_mat_file(\
+                                    file_="./WordMoversEmbeddings/mat_files/"+filename,\
+                                    version=version, return_type="all")
 
     # set hyper-parameters
     # sample_size_list = range(100,4906, 20)
@@ -165,9 +144,8 @@ def main(argv):
     config = {"samples":FLAGS.sample_size,\
               "CV":10, \
               "gamma": FLAGS.gamma,\
-              "lambda_inverse":FLAGS.lambda_inverse,
-              "approximator":approximator,
-              "runs": FLAGS.runs}
+              "lambda_inverse":FLAGS.lambda_inverse,\
+              "approximator":approximator}
 
     train_all(similarity_matrix, labels, config)
     return None

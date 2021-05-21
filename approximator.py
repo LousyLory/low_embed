@@ -91,6 +91,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
                              list_of_available_indices, k))
 
     A = similarity_matrix[sample_indices][:, sample_indices]
+    A = np.power(A, gamma)
     # estimating min eig in the following block
     if mult == 0:
         large_k = np.int(np.sqrt(k*len(similarity_matrix)))
@@ -103,6 +104,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
     larger_sample_indices = np.sort(random.sample(\
                             list_of_available_indices, large_k))
     Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
+    Z = np.power(Z,gamma)
     min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
     min_eig = eig_mult*np.real(min_eig)
     if scaling == True:
@@ -114,7 +116,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
         KS = similarity_matrix_x[indices][:, sample_indices]
     else:
         KS = similarity_matrix_x[:, sample_indices]
-    
+    KS = np.power(KS, gamma)
     if return_type == "error":
         return np.linalg.norm(\
                 similarity_matrix - \
@@ -126,8 +128,10 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
 
 def nystrom_with_samples(similarity_matrix, indices, samples, min_eig,gamma=1.0):
     A = similarity_matrix[samples][:, samples]
+    A = np.power(A, gamma)
     A = A - min_eig*np.eye(len(A))
     KS = similarity_matrix[indices][:, samples]
+    KS = np.power(KS, gamma)
     return KS, A
 
 
@@ -197,16 +201,25 @@ def CUR(similarity_matrix, k, indices=None, \
     samp_pj = pj[0:len(samples_c)]#pj[samples_c]
     samp_qi = qi[0:len(samples_r)]#qi[samples_r]
     if indices is not None:
-        C = similarity_matrix[indices][:, samples_c] / np.sqrt(samp_pj*c)
+        C = similarity_matrix[indices][:, samples_c] 
+        C = np.power(C, gamma)
+        C = C / np.sqrt(samp_pj*c)
     else:
-        C = similarity_matrix[:, samples_c] / np.sqrt(samp_pj*c)
+        C = similarity_matrix[:, samples_c] 
+        C = np.power(C, gamma)
+        C = C / np.sqrt(samp_pj*c)
     rank_k_C = C
     # modification works only because we assume similarity matrix is symmetric
     if indices is not None:
-        R = similarity_matrix[indices][:, samples_r] / np.sqrt(samp_qi*r)   
+        R = similarity_matrix[indices][:, samples_r] 
+        R = np.power(R, gamma)
+        R = R / np.sqrt(samp_qi*r)   
     else:
-        R = similarity_matrix[:, samples_r] / np.sqrt(samp_qi*r)
+        R = similarity_matrix[:, samples_r]
+        R = np.power(R, gamma)
+        R = R / np.sqrt(samp_qi*r)   
     R = R.T
+
     psi = C[samples_r, :].T / np.sqrt(samp_qi*r)
     psi = psi.T
 
@@ -228,7 +241,10 @@ def CUR_with_samples(similarity_matrix, indices, samples,gamma=1.0):
     pj = np.ones(len(indices)).astype(float) / float(len(indices))
     qi = np.ones(len(indices)).astype(float) / float(len(indices))
 
-    C = similarity_matrix[indices, samples] / np.sqrt(pj * len(samples))
+    C = similarity_matrix[indices, samples] 
+    C = np.power(C, gamma)
+    C = C / np.sqrt(pj * len(samples))
+
     psi = similarity_matrix[samples, samples] / np.sqrt(qi*len(samples))
     U = np.linalg.pinv(C.T @ C)
     U = U @ psi

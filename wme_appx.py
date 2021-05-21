@@ -47,8 +47,7 @@ def get_feat(X, indices, k, gamma, approximator, mode="train", \
 
     if approximator == "CUR":
         if mode == "train":
-            C, U, sample_indices = CUR(X,\
-                                       k,\
+            C, U, sample_indices = CUR(X, k,\
                                        indices=list(indices),\
                                        return_type="decomposed",\
                                        gamma=gamma)

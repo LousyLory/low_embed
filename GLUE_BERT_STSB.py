@@ -283,12 +283,12 @@ if mode == "nystrom":
 if mode == "CUR":
     approx_sim_mat = CUR(similarity_matrix, num_samples, return_type="approximation")
 print("error:", 
-    np.linalg.norm(similarity_matrix-approx_sim_mat)/ np.linalg.norm(similarity_matrix))
+    np.linalg.norm(reshaped_preds-approx_sim_mat)/ np.linalg.norm(reshaped_preds))
 #########################################################################################
 
 #============================ compute approximation error ==============================#
 approx_sim_mat = add_rows_back(approx_sim_mat, duplicate_ids, matched_ids)
-print("approximate similarity scores "+str(num_samples))
+# print("approximate similarity scores "+str(num_samples))
 # print(np.min(approx_sim_mat), np.max(approx_sim_mat), \
 #     np.min(original_scores[:,2]), np.max(original_scores[:,2]))
 evaluate(approx_sim_mat, original_scores, database=dataset)

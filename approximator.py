@@ -3,7 +3,8 @@ from copy import deepcopy
 import random
 # import torch
 
-def nystrom(similarity_matrix, k, min_eig=0.0, min_eig_mode=False, return_type="error", correct_outer=False):
+def nystrom(similarity_matrix, k, min_eig=0.0, \
+    min_eig_mode=False, return_type="error", correct_outer=False, gamma=0.1):
     """
     compute nystrom approximation
     versions:
@@ -73,7 +74,7 @@ def ratio_nystrom(similarity_matrix, k, min_eig=0.0, min_eig_mode=False, return_
 
 
 def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
-    scaling=False, mult=0, eig_mult=1, indices=None):
+    scaling=False, mult=0, eig_mult=1, indices=None, gamma=1.0):
     """
     compute eigen corrected nystrom approximations
     versions:
@@ -123,7 +124,7 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
         return KS, A, sample_indices, min_eig
 
 
-def nystrom_with_samples(similarity_matrix, indices, samples, min_eig):
+def nystrom_with_samples(similarity_matrix, indices, samples, min_eig,gamma=1.0):
     A = similarity_matrix[samples][:, samples]
     A = A - min_eig*np.eye(len(A))
     KS = similarity_matrix[indices][:, samples]
@@ -132,7 +133,7 @@ def nystrom_with_samples(similarity_matrix, indices, samples, min_eig):
 
 
 def CUR(similarity_matrix, k, indices=None, \
-    eps=1e-3, delta=1e-14, return_type="error", same=True):
+    eps=1e-3, delta=1e-14, return_type="error", same=True, gamma=1.0):
     """
     implementation of Linear time CUR algorithm of Drineas2006 et. al.
 
@@ -223,7 +224,7 @@ def CUR(similarity_matrix, k, indices=None, \
         return relative_error
 
 
-def CUR_with_samples(similarity_matrix, indices, samples):
+def CUR_with_samples(similarity_matrix, indices, samples,gamma=1.0):
     pj = np.ones(len(indices)).astype(float) / float(len(indices))
     qi = np.ones(len(indices)).astype(float) / float(len(indices))
 

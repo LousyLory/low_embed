@@ -24,7 +24,7 @@ flags.DEFINE_string('dataset', "twitter", "twitter or ohsumed or news or recipe"
 flags.DEFINE_string('method', "CUR", "method for approximation")
 flags.DEFINE_float('lambda_inverse', 1e4, "lambda inverse value")
 flags.DEFINE_float('gamma', 0.1, "exp(-dsr/gamma)")
-flags.DEFINE_integer('sample_size', 1000, "number of samples to be considered")
+flags.DEFINE_integer('sample_size', 500, "number of samples to be considered")
 
 flags.DEFINE_string('mode', "train", "run mode")
 
@@ -72,14 +72,12 @@ def train_all(X, Y, config):
         # train features
         train_feats, indices, eig = \
                         get_feat(X, train_index, \
-                            config["runs"], \
                             config["samples"], \
                             config["gamma"], \
                             config["approximator"])
 
         # validation features
         val_feats = get_feat(X, val_index, \
-                              config["runs"], \
                               config["samples"], \
                               config["gamma"], \
                               config["approximator"], \

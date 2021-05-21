@@ -7,6 +7,21 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
 
 
     x_axis = list(range(10, id_count, step))
+    if name == "stsb":
+        total_samples = 3000.0
+    if name == "mrpc":
+        total_samples = 816.0
+    if name == "rte":
+        total_samples = 554.0
+    if name == "twitter":
+        total_samples = 2176.0
+    if name == "recipe":
+        total_samples = 27841.0
+    if name == "oshumed":
+        total_samples = 3999.0
+    if name == "news":
+        total_samples = 11293.0
+    x_axis = np.array(x_axis) / total_samples
 
     plt.gcf().clear()
     scale_ = 0.55
@@ -30,14 +45,29 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         ax1.plot(np.array(x_axis),arr1,\
             label=labels[i], **STYLE_MAP["plot"])
 
-    if colormaps == 1:
-        colormap = plt.cm.cool
-        colors = [colormap(i) for i in np.linspace(0, 1,len(ax1.lines))]
+    # if colormaps == 1:
+    #     colormap = plt.cm.cool
+    #     colors = [colormap(i) for i in np.linspace(0, 1,len(ax1.lines))]
+    colors = ["#FC5A50", "#069AF3", "#15B01A", "#9A0EEA"]
 
     for i,j in enumerate(ax1.lines):
         j.set_color(colors[i])
 
     title_name = name
+    if title_name == "stsb":
+        title_name = "STS-B"
+    if title_name == "mrpc":
+        title_name = "MRPC"
+    if title_name == "rte":
+        title_name = "RTE"
+    if title_name == "twitter":
+        title_name = "Twitter"
+    if title_name == "recipe":
+        title_name = "RecipeL"
+    if title_name == "news":
+        title_name = "20-News"
+    if title_name == "oshumed":
+        title_name = "Ohsumed"
 
     directory = "figures/"+save_path+"/"
     if not os.path.isdir(directory):
@@ -49,7 +79,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
     plt.locator_params(axis='x', nbins=6)
     if len(y_lims) > 0:
         plt.ylim(bottom=y_lims[0], top=y_lims[1])
-    plt.xlabel("Number of landmark samples")
+    plt.xlabel("Proportion of dataset chosen as landmark samples")
     plt.ylabel("Average approximation error")
     plt.title(title_name, fontsize=13)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])

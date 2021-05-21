@@ -12,6 +12,123 @@ import numpy as np
 from scipy.stats.stats import pearsonr, spearmanr
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
+import random
+
+def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error", same=True):
+    """
+    implementation of Linear time CUR algorithm of Drineas2006 et. al.
+
+    input:
+    1. similarity matrix in R^{n,d}
+    2. integers c, r, and k
+
+    output:
+    1. either C, U, R matrices
+    or
+    1. CU^+R
+    or
+    1. error = similarity matrix - CU^+R
+
+    """
+    n,d = similarity_matrix.shape
+    # setting up c, r, eps, and delta for error bound
+    # c = (64*k*((1+8*np.log(1/delta))**2) / (eps**4)) + 1
+    # r = (4*k / ((delta*eps)**2)) + 1
+    # c = 4*k
+    c = k
+    r = k
+    if c > n:
+        c= n
+    # r = 4*k
+    if r > n:
+        r = n
+    # print("chosen c, r:", c,r)
+    try:
+        assert 1 <= c and c <= d
+    except AssertionError as error:
+        print("1 <= c <= m is not true")
+    try:
+        assert 1 <= r and r <= n
+    except AssertionError as error:
+        print("1 <= r <= n is not true")
+    try:
+        assert 1 <= k and k <= min(c,r)
+    except AssertionError as error:
+        print("1 <= k <= min(c,r)")
+
+    # using uniform probability instead of row norms
+    pj = np.ones(d).astype(float) / float(d)
+    qi = np.ones(n).astype(float) / float(n)
+
+    # choose samples
+    samples_c = np.random.choice(range(d), c, replace=False, p = pj)
+    if same:
+        samples_r = samples_c
+    else:
+        samples_r = np.random.choice(range(n), r, replace=False, p = qi)
+
+    # grab rows and columns and scale with respective probability
+    samp_pj = pj[samples_c]
+    samp_qi = qi[samples_r]
+    C = similarity_matrix[:, samples_c] / np.sqrt(samp_pj*c)
+    rank_k_C = C
+    # modification works only because we assume similarity matrix is symmetric
+    R = similarity_matrix[:, samples_r] / np.sqrt(samp_qi*r)
+    R = R.T
+    psi = C[samples_r, :].T / np.sqrt(samp_qi*r)
+    psi = psi.T
+
+    U = np.linalg.pinv(rank_k_C.T @ rank_k_C)
+    # i chose not to compute rank k reduction of U
+    U = U @ psi.T
+    
+    if return_type == "decomposed":
+        return C, U, R
+    if return_type == "approximation":
+        return (C @ U) @ R
+    if return_type == "error":
+        # print(np.linalg.norm((C @ U) @ R))
+        relative_error = np.linalg.norm(similarity_matrix - \
+            ((C @ U) @ R)) / np.linalg.norm(similarity_matrix)
+        return relative_error
+
+def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
+    scaling=False, mult=0, eig_mult=1):
+    """
+    compute eigen corrected nystrom approximations
+    versions:
+    1. Eigen corrected without scaling (scaling=False)
+    2. Eigen corrected with scaling (scaling=True)
+    """
+    eps=1e-16
+    list_of_available_indices = range(len(similarity_matrix))
+    sample_indices = np.sort(random.sample(\
+                     list_of_available_indices, k))
+    A = similarity_matrix[sample_indices][:, sample_indices]
+    # estimating min eig in the following block
+    if mult == 0:
+        large_k = np.int(np.sqrt(k*len(similarity_matrix)))
+    else:
+        large_k = min(mult*k, len(similarity_matrix)-1)
+    larger_sample_indices = np.sort(random.sample(\
+                            list_of_available_indices, large_k))
+    Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
+    min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
+    min_eig = eig_mult*min_eig
+    if scaling == True:
+        min_eig = min_eig*np.float(len(similarity_matrix))/np.float(large_k)
+
+    A = A - min_eig*np.eye(len(A))
+    similarity_matrix_x = deepcopy(similarity_matrix)
+    KS = similarity_matrix_x[:, sample_indices]
+    
+    if return_type == "error":
+        return np.linalg.norm(\
+                similarity_matrix - \
+                KS @ np.linalg.pinv(A) @ KS.T)\
+                / np.linalg.norm(similarity_matrix), min_eig
+    if return_type == "approximation":
+        return KS @ np.linalg.pinv(A) @ KS.T
 
 def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
@@ -105,27 +222,27 @@ def evaluate(A, original_score, database="stsb"):
         pass
     return None
 
-def fix_vals_first(A, original_score):
-    rows = original_score[:,0].astype(int)
-    cols = original_score[:,1].astype(int)
-    computed_scores = A[rows, cols]
-    D = np.eye(len(A))
-    D[rows, cols] = computed_scores
-    D[cols, rows] = computed_scores
-    return D
+# def fix_vals_first(A, original_score):
+#     rows = original_score[:,0].astype(int)
+#     cols = original_score[:,1].astype(int)
+#     computed_scores = A[rows, cols]
+#     D = np.eye(len(A))
+#     D[rows, cols] = computed_scores
+#     D[cols, rows] = computed_scores
+#     return D
 
 #############################################################################################
 #================================= Data extraction =========================================#
 # READ THE FILE
-dataset = "rte"
-num_samples = 200
+dataset = sys.argv[1]
+num_samples = int(sys.argv[3])
 
 reshaped_preds = read_file(file_="../GYPSUM/"+dataset+"_predicts_0.npy")
 # READ LABELS FROM FILE
 original_scores = read_labels("../GYPSUM/"+dataset+"_label_ids.txt")
 
 # reshaped_preds = reshaped_preds
-reshaped_preds = fix_vals_first(reshaped_preds, original_scores)
+# reshaped_preds = fix_vals_first(reshaped_preds, original_scores)
 # print(reshaped_preds.shape)
 
 # FIND OUT DUPLICATE ROWS AND ELIMINATE!!
@@ -146,7 +263,7 @@ similarity_matrix = (similarity_matrix+similarity_matrix.T) / 2.0
 restored_similarity_matrix = add_rows_back(similarity_matrix, duplicate_ids, matched_ids)
 #############################################################################################
 
-#============================ compute the required scores ================================#
+#============================ check the required scores ================================#
 # print("true scores")
 # evaluate(reshaped_preds, original_scores, database=dataset)
 # print("symmetrized scores")
@@ -158,32 +275,32 @@ restored_similarity_matrix = add_rows_back(similarity_matrix, duplicate_ids, mat
 #########################################################################################
 
 #================================== approximation =====================================#
-# error, abs_error, avg_min_eig, approx_sim_mat = simple_nystrom(\
-#                                         deepcopy(similarity_matrix),\
-#                                         deepcopy(similarity_matrix),\
-#                                         num_samples,\
-#                                         runs=10,\
-#                                         mode="eigI",\
-#                                         normalize="original",\
-#                                         expand=True)
-# print(error, abs_error)
+mode = sys.argv[2]
+if mode == "nystrom":
+    approx_sim_mat = nystrom_with_eig_estimate(\
+                    similarity_matrix, num_samples, return_type="approximation", \
+                    mult=2, eig_mult=1.5)
+if mode == "CUR":
+    approx_sim_mat = CUR(similarity_matrix, num_samples, return_type="approximation")
+print("error:", 
+    np.linalg.norm(similarity_matrix-approx_sim_mat)/ np.linalg.norm(similarity_matrix))
 #########################################################################################
 
 #============================ compute approximation error ==============================#
-# approx_sim_mat = add_rows_back(approx_sim_mat, duplicate_ids, matched_ids)
-# # approx_sim_mat = scale_scores(approx_sim_mat, reshaped_preds, original_scores)
-# print("approximate similarity scores "+str(num_samples))
+approx_sim_mat = add_rows_back(approx_sim_mat, duplicate_ids, matched_ids)
+print("approximate similarity scores "+str(num_samples))
 # print(np.min(approx_sim_mat), np.max(approx_sim_mat), \
 #     np.min(original_scores[:,2]), np.max(original_scores[:,2]))
-# evaluate(approx_sim_mat, original_scores, database=dataset)
+evaluate(approx_sim_mat, original_scores, database=dataset)
+# evaluate(reshaped_preds, original_scores, database=dataset)
 #########################################################################################
 
 #================================= checking for RTE ====================================#
 # grab the scores
-rows = original_scores[:,0].astype(int)
-cols = original_scores[:,1].astype(int)
-computed_scores_forward = reshaped_preds[rows, cols]
-computed_scores_backward = reshaped_preds[cols, rows]
-print(pearsonr(computed_scores_forward, computed_scores_backward)[0])
-print(spearmanr(computed_scores_forward, computed_scores_backward)[0])
+# rows = original_scores[:,0].astype(int)
+# cols = original_scores[:,1].astype(int)
+# computed_scores_forward = reshaped_preds[rows, cols]
+# computed_scores_backward = reshaped_preds[cols, rows]
+# print(pearsonr(computed_scores_forward, computed_scores_backward)[0])
+# print(spearmanr(computed_scores_forward, computed_scores_backward)[0])
 #########################################################################################

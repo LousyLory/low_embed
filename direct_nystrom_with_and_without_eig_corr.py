@@ -249,7 +249,7 @@ similarity_matrix_O = similarity_matrix[indices][:, indices]
 # symmetrization
 similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
 # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
-id_count = 500#len(similarity_matrix-1)
+id_count = len(similarity_matrix-1)
 print(dataset)
 
 # if filename == "rte":
@@ -376,7 +376,7 @@ for k in tqdm(range(10, id_count, 10)):
     CUR_same_error_list.append(error)
     pass
 
-
+# print(CUR_same_error_list)
 ################################ leverage scores #############################
 # for k in tqdm(range(10, id_count, 10)):
 #     err = 0

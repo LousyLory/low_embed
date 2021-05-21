@@ -25,10 +25,12 @@ for file_ in files:
     else:
         id_count = 1500
     min_y = 0.0
-    max_y = 1.0
+    if nom == "news":
+        min_y = 0.2
+    max_y = 0.5
 
     if nom == "news" or nom == "mrpc" or nom == "recipe":
-        max_y = 2.0
+        max_y = 0.5
 
     plot_errors([true_nystrom, min_eig_nystrom, our_nystrom, CUR], \
                  id_count, \

@@ -21,7 +21,7 @@ from absl import app
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string('dataset', "twitter", "twitter or ohsumed or news or recipe")
-flags.DEFINE_string('method', "CUR", "method for approximation")
+flags.DEFINE_string('method', "nystrom", "method for approximation")
 flags.DEFINE_float('lambda_inverse', 1e4, "lambda inverse value")
 flags.DEFINE_float('gamma', 0.1, "exp(-dsr/gamma)")
 flags.DEFINE_integer('sample_size', 500, "number of samples to be considered")
@@ -54,8 +54,8 @@ def get_feat(X, indices, k, gamma, approximator, mode="train", \
             feats = C @ sqrtm(U)
             return feats, sample_indices, None
         if mode == "val":
-            C, U = CUR_test(X, indices, sample_indices=samples, gamma=gamma)
-            feats = C @ sqrtm(C)
+            C, U = CUR_test(X, indices, samples=samples, gamma=gamma)
+            feats = C @ sqrtm(U)
             return feats
 
 
@@ -92,7 +92,7 @@ def train_all(X, Y, config):
         [_, val_accuracy, _] = predict(Y_val, val_feats, model_linear)
         # validation accuracy
         valAccu.append(val_accuracy[0])
-
+    print(np.mean(valAccu), np.std(valAccu))
     #wandb.log({"validation_mean":np.mean(valAccu), \
     #    "validation_std":np.std(valAccu)})
     #logging.info("validation_accuracy: %s", np.mean(valAccu))

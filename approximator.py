@@ -191,11 +191,11 @@ def CUR(similarity_matrix, k, indices=None, \
     if indices is not None:
         samples_c = np.sort(np.random.choice(indices, c, replace=False, p = pj))
     else:
-        samples_c = np.random.choice(range(d), c, replace=False, p = pj)
+        samples_c = np.sort(np.random.choice(range(d), c, replace=False, p = pj))
     if same:
         samples_r = samples_c
     else:
-        samples_r = np.random.choice(range(n), r, replace=False, p = qi)
+        samples_r = np.sort(np.random.choice(range(n), r, replace=False, p = qi))
 
     # grab rows and columns and scale with respective probability
     samp_pj = pj[0:len(samples_c)]#pj[samples_c]
@@ -220,7 +220,7 @@ def CUR(similarity_matrix, k, indices=None, \
         R = R / np.sqrt(samp_qi*r)   
     R = R.T
 
-    psi = C[samples_r, :].T / np.sqrt(samp_qi*r)
+    psi = similarity_matrix[samples_r][:,samples_r].T / np.sqrt(samp_qi*r)
     psi = psi.T
 
     U = np.linalg.pinv(rank_k_C.T @ rank_k_C)
@@ -238,14 +238,12 @@ def CUR(similarity_matrix, k, indices=None, \
 
 
 def CUR_with_samples(similarity_matrix, indices, samples,gamma=1.0):
-    pj = np.ones(len(indices)).astype(float) / float(len(indices))
-    qi = np.ones(len(indices)).astype(float) / float(len(indices))
-
-    C = similarity_matrix[indices, samples] 
+    n = len(samples)
+    C = similarity_matrix[indices][:, samples] 
     C = np.power(C, gamma)
-    C = C / np.sqrt(pj * len(samples))
+    C = C / np.sqrt(1 / n)
 
-    psi = similarity_matrix[samples, samples] / np.sqrt(qi*len(samples))
+    psi = similarity_matrix[samples][:, samples] / np.sqrt(1/n)
     U = np.linalg.pinv(C.T @ C)
     U = U @ psi
     return C, U

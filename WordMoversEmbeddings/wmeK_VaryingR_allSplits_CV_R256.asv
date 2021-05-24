@@ -35,7 +35,7 @@ for jjj = 1:length(filename_list)
     info = [];
     filename = filename_list{jjj};
     disp(filename);
-    if strcmp(filename, filename_list{1})
+    if strcmp(filename, filename_list{0})
         if wordemb_scheme >= 1 
             if wordweight_scheme == 1
                 if docemb_scheme == 1
@@ -44,12 +44,12 @@ for jjj = 1:length(filename_list)
                     lambda_inverse = 1000;
                 elseif docemb_scheme == 2
                     % DMax = 9;
-                    gamma = 0.231;
-                    lambda_inverse = 5504874277;
+                    gamma = 0.1495;
+                    lambda_inverse = 1000;
                 end  
             end
         end
-        filename_postfix = '-emd_tr_te_ix.mat';
+        filename_postfix = '-emd_tr_te_split.mat';
     end
     disp(filename_postfix);
     

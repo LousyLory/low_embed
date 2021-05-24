@@ -51,7 +51,7 @@ function[mapped_feats, samples, sample_weights, user_emd_time] = WMD_Nystrom(tra
         sKs = Ks(s, :);
     end
     [Vs, Es] = eig(Kz);
-    minEig = eigs(Kz, 1, 'smallestabs');
+    minEig = eigs(Kz, 1, 'smallestreal');
     minEigI = c_for_eig* minEig * eye(n,n);
     if size(samples, 1) == 0
         % train case

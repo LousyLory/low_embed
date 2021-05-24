@@ -1,0 +1,24 @@
+{
+    "os": "Windows-10-10.0.19041-SP0",
+    "python": "3.8.5",
+    "heartbeatAt": "2021-05-22T18:15:58.506188",
+    "startedAt": "2021-05-22T18:15:57.329522",
+    "docker": null,
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "gpu_count": 1,
+    "cpu_count": 24,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": ".\\wme_appx.py",
+    "codePath": "wme_appx.py",
+    "git": {
+        "remote": "git@github.com:lousylory/low_embed.git",
+        "commit": "d908e71006c53068120fb8b480e3acf3e93a175b"
+    },
+    "email": "talk2archan@gmail.com",
+    "root": "E:/Research/low_embed",
+    "host": "Freedman",
+    "username": "Archan",
+    "executable": "C:\\Users\\Archan\\anaconda3\\python.exe"
+}

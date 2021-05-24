@@ -21,6 +21,8 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         total_samples = 3999.0
     if name == "news":
         total_samples = 11293.0
+    if name == "PSD":
+        total_samples = 1000.0
     x_axis = np.array(x_axis) / total_samples
 
     plt.gcf().clear()
@@ -43,7 +45,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         error_pairs = lists[i]
         arr1 = np.array(error_pairs)
         ax1.plot(np.array(x_axis),arr1,\
-            label=labels[i], **STYLE_MAP["plot"])
+            label=labels[i], **STYLE_MAP["plot"], alpha=0.5)
 
     # if colormaps == 1:
     #     colormap = plt.cm.cool

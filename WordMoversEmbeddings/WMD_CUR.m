@@ -23,7 +23,13 @@ function[mapped_feats, samples, sample_weights, user_emd_time] = WMD_CUR(train_X
     [C, C_emd_time] = wmd_dist(train_X,train_weight_X,...
         samples,sample_weights,gamma);
     C = C / (((1/n)*sample_size)^0.5);
-    psi = C(s, :);
+    if size(samples, 1) == 0
+        psi = C(s, :);
+        psi_emd_time = 0;
+    else
+        [psi, psi_emd_time] = wmd_dist(samples,sample_weights,...
+        samples,sample_weights,gamma);
+    end
     psi = psi / (((1/n)*sample_size)^0.5);
     
     % house cleaning
@@ -31,7 +37,9 @@ function[mapped_feats, samples, sample_weights, user_emd_time] = WMD_CUR(train_X
     psi(psi > 1e+08) = 0;
     
     U = C'*C;
+    U = eps*eye(size(U,1));
     U = U \ psi;
+    
     
     [S,V,~] = svd(U);
     sqrtU = S*(V^0.5);

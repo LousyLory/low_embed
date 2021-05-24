@@ -5,7 +5,7 @@
 % Date: 19 October, 2020
 
 function[mapped_feats, samples, sample_weights, user_emd_time] = WMD_CUR(train_X,...
-    train_weight_X, gamma, sample_size, R, samples, sample_weights, c_for_eig)
+    train_weight_X, gamma, sample_size, samples, sample_weights)
     
     % reduce set here before using Nystrom
     n = size(train_X,2);
@@ -23,7 +23,12 @@ function[mapped_feats, samples, sample_weights, user_emd_time] = WMD_CUR(train_X
     [C, C_emd_time] = wmd_dist(train_X,train_weight_X,...
         samples,sample_weights,gamma);
     C = C / (((1/n)*sample_size)^0.5);
-    psi = C(s, :);
+    if size(samples, 1) == 0
+        psi = C(s, :);
+    else
+        psi = wmd_dist(train_X,train_weight_X,...
+        samples,sample_weights,gamma);
+    end
     psi = psi / (((1/n)*sample_size)^0.5);
     
     % house cleaning
@@ -39,6 +44,5 @@ function[mapped_feats, samples, sample_weights, user_emd_time] = WMD_CUR(train_X
     user_emd_time = C_emd_time+psi_emd_time;
     
     % computing features
-    
     mapped_feats = C * sqrtU;
 end

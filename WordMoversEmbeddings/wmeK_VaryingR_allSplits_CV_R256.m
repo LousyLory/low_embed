@@ -14,7 +14,7 @@ parpool('local', nthreads);
 addpath(genpath('utilities'));
 addpath('liblinear-2.41\matlab');
 file_dir = './WME_tc_datasets_emnlp18';
-filename_list = {'ohsumed'};
+filename_list = {'recipe'};
 
 randdoc_scheme = 1;     % if 1, RF features - uniform distribution
 wordemb_scheme = 2;     % if 1, use pre-trained word2vec
@@ -27,7 +27,7 @@ docemb_scheme = 2;      % if 1, use dist directly;
 DMin = 1;    
 % R_list = [4 8 16 32 64 128 256 512];
 % R_list = [4 8 16 32 64 128 256 512 1024 2048 4096 8192];
-sample_size_list = [488];
+sample_size_list = [550];
 R = 1;
 c = 1;
 for jjj = 1:length(filename_list)
@@ -49,7 +49,7 @@ for jjj = 1:length(filename_list)
                 end  
             end
         end
-        filename_postfix = '-emd_tr_te_ix.mat';
+        filename_postfix = '-emd_tr_te_split.mat';
     end
     disp(filename_postfix);
     

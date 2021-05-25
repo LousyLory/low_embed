@@ -39,11 +39,11 @@ def plot(dataset, eigenvals, ipsd, rank):
         dataset = "DonkeyKong TPS"
     x_axis = list(range(1,len(eigenvals)+1))
 
-    plt.rc('axes', titlesize=13)
-    plt.rc('axes', labelsize=13)
+    plt.rc('axes', titlesize=20)
+    plt.rc('axes', labelsize=20)
     plt.rc('xtick', labelsize=13)
     plt.rc('ytick', labelsize=13)
-    plt.rc('legend', fontsize=11)
+    plt.rc('legend', fontsize=18)
 
     STYLE_MAP = {"eigenvals": {"color": "#dc143c",  "marker": ".", 'label': 'eigenvalues', 'linewidth': 1},
                  }
@@ -55,18 +55,18 @@ def plot(dataset, eigenvals, ipsd, rank):
     eigval_estimate_pairs = [(x, y) for x, y in zip(x_axis, list(np.squeeze(eigenvals)))]
     arr1 = np.array(eigval_estimate_pairs)
     plt.scatter(arr1[:, 0], arr1[:, 1], **STYLE_MAP['eigenvals'])
-    plt.figtext(.7, .7, "Is PSD? = "+str(ipsd), fontsize=12)
-    plt.figtext(.7, .65, "Rank = "+str(rank), fontsize=12)
+    # plt.figtext(.7, .7, "Is PSD? = "+str(ipsd), fontsize=12)
+    # plt.figtext(.7, .65, "Rank = "+str(rank), fontsize=12)
     plt.locator_params(axis='x', nbins=6)
     plt.xlabel("Eigenvalue indices")
     plt.ylabel("Eigenvalues")
     # plt.tight_layout()
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     # plt.legend(loc='upper right')
-    plt.title(dataset, fontsize=13)
+    plt.title(dataset, fontsize=20)
     # plt.title("Minimum eigenvalue estimates", fontsize=13)
     # plt.savefig("./test2.pdf")
-    plt.savefig("figures/final_"+dataset+"_all_eigenvalue_plot.pdf")
+    plt.savefig("figures/eigenvalue_plots/"+dataset+".pdf")
     plt.close()
 
 
@@ -120,7 +120,7 @@ def plot_validation(dataset, validation):
     plt.title(dataset, fontsize=13)
     # plt.title("Minimum eigenvalue estimates", fontsize=13)
     # plt.savefig("./test2.pdf")
-    plt.savefig("figures/final_"+dataset+"_validation_plot.pdf")
+    plt.savefig("figures/eigenvalue_plots/"+dataset+".pdf")
     plt.close()
 
 read_mat_eig_file("./WordMoversEmbeddings/")

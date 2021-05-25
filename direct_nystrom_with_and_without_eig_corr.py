@@ -57,7 +57,7 @@ def CUR_alt(similarity_matrix, k, return_type="error"):
                      list_of_available_indices, k))
     sample_indices_cols = np.sort(random.sample(\
                      list_of_available_indices, k))
-    A = similarity_matrix[sample_indices_cols][:, sample_indices_rows]
+    A = similarity_matrix[sample_indices_rows][:, sample_indices_cols]
     
     similarity_matrix_x = deepcopy(similarity_matrix)
     KS_cols = similarity_matrix_x[:, sample_indices_cols]
@@ -238,7 +238,7 @@ runs_ = 3
 filetype = None
 dataset = sys.argv[1]
 if dataset == "PSD":
-    feats = np.random.random((1000,700))
+    feats = np.random.random((1000,1000))
     similarity_matrix = feats @ feats.T
     filetype = "numpy"
 if dataset == "mrpc" or dataset == "rte" or dataset == "stsb":
@@ -279,7 +279,7 @@ if dataset != "PSD":
     # symmetrization
     similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
     # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
-id_count = len(similarity_matrix)-1
+id_count = 1000#len(similarity_matrix)-1
 print(dataset)
 
 # if filename == "rte":
@@ -396,25 +396,25 @@ for k in tqdm(range(10, id_count, 10)):
 #     CUR_diff_error_list.append(error)
 #     pass
 
-print("CUR")
-for k in tqdm(range(10, id_count, 10)):
-    err = 0
-    for j in range(runs_):
-        error = CUR(similarity_matrix, k, same=True)
-        err += error
-    error = err/np.float(runs_)
-    CUR_same_error_list.append(error)
-    pass
+# print("CUR")
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     for j in range(runs_):
+#         error = CUR(similarity_matrix, k, same=True)
+#         err += error
+#     error = err/np.float(runs_)
+#     CUR_same_error_list.append(error)
+#     pass
 
-print("CUR diff")
-for k in tqdm(range(10, id_count, 10)):
-    err = 0
-    for j in range(runs_):
-        error = CUR(similarity_matrix, k, same=False)
-        err += error
-    error = err/np.float(runs_)
-    CUR_diff_error_list.append(error)
-    pass
+# print("CUR diff")
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     for j in range(runs_):
+#         error = CUR(similarity_matrix, k, same=False)
+#         err += error
+#     error = err/np.float(runs_)
+#     CUR_diff_error_list.append(error)
+#     pass
 
 print("alt nyst")
 for k in tqdm(range(10, id_count, 10)):
@@ -449,10 +449,14 @@ for k in tqdm(range(10, id_count, 10)):
 
 #######################################################################
 # SAVE
-import pickle
-with open("alt_exp/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
-    pickle.dump([true_error, CUR_same_error_list, \
-        CUR_diff_error_list, CUR_alt_error_list], f)
+# import pickle
+# with open("alt_exp/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
+#     pickle.dump([true_error, CUR_same_error_list, \
+#         CUR_diff_error_list, CUR_alt_error_list], f)
+plt.plot(CUR_alt_error_list)
+plt.plot(true_error)
+plt.ylim(top=2.0, bottom=0.0)
+plt.show()
 #######################################################################
 # # PLOTS
 # plot_errors([nscaling_error_list, CUR_same_error_list], \

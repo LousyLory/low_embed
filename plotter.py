@@ -33,11 +33,11 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111)
 
-    plt.rc('axes', titlesize=13)
-    plt.rc('axes', labelsize=13)
+    plt.rc('axes', titlesize=18)
+    plt.rc('axes', labelsize=15)
     plt.rc('xtick', labelsize=13)
     plt.rc('ytick', labelsize=13)
-    plt.rc('legend', fontsize=11)
+    plt.rc('legend', fontsize=18)
 
     STYLE_MAP = {"plot":{"marker":".", "markersize":7, "linewidth":1}}
 
@@ -83,7 +83,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         plt.ylim(bottom=y_lims[0], top=y_lims[1])
     plt.xlabel("Proportion of dataset chosen as landmark samples")
     plt.ylabel("Average approximation error")
-    plt.title(title_name, fontsize=13)
+    plt.title(title_name, fontsize=21)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     ax1.legend(loc='upper right')
     plt.savefig(path)

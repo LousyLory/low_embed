@@ -50,7 +50,7 @@ def name_corrector_and_idcount(file_, true_nystrom):
         id_count = 1500
     return name, id_count
 
-mode = "nystom only"
+mode = "nystrom vs cur variants"
 for file_ in files:
     print(file_)
 

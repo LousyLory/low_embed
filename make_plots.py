@@ -79,12 +79,18 @@ for file_ in files:
 
         name, id_count = name_corrector_and_idcount(file_, true_nystrom)
 
+        if name == "twitter" or name == "PSD" or name == "ohsumed":
+            y_lim = []
+        else:
+            y_lim = [0.0, 2.0]
+
+
         plot_errors([true_nystrom, CUR, CUR_diff, CUR_alt], \
                      id_count, \
                      ["true nystrom", "CUR same", "CUR diff", "CUR alt"], \
                      step=10, \
                      colormaps=1, name=name, \
-                     save_path="comparison_true_nystrom_vs_CUR_variants", y_lims=[0.0, 2.0])
+                     save_path="comparison_true_nystrom_vs_CUR_variants", y_lims=y_lim)
 
     if mode == "nystom only":
         true_nystrom = data[0]

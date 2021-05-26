@@ -54,9 +54,9 @@ def CUR_alt(similarity_matrix, k, return_type="error"):
     """
     list_of_available_indices = range(len(similarity_matrix))
     sample_indices_rows = np.sort(random.sample(\
-                     list_of_available_indices, k))
+                     list_of_available_indices, min(k, len(similarity_matrix))))
     sample_indices_cols = np.sort(random.sample(\
-                     list_of_available_indices, k))
+                     list(sample_indices_rows), int(k/2)))
     A = similarity_matrix[sample_indices_rows][:, sample_indices_cols]
     
     similarity_matrix_x = deepcopy(similarity_matrix)
@@ -129,6 +129,48 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
     larger_sample_indices = np.sort(random.sample(\
                             list_of_available_indices, large_k))
     Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
+    min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
+    min_eig = eig_mult*min_eig
+    if scaling == True:
+        min_eig = min_eig*np.float(len(similarity_matrix))/np.float(large_k)
+
+    A = A - min_eig*np.eye(len(A))
+    similarity_matrix_x = deepcopy(similarity_matrix)
+    KS = similarity_matrix_x[:, sample_indices]
+    
+    if return_type == "error":
+        return np.linalg.norm(\
+                similarity_matrix - \
+                KS @ np.linalg.pinv(A) @ KS.T)\
+                / np.linalg.norm(similarity_matrix), min_eig
+
+
+def nystrom_with_eig_estimate_sub(similarity_matrix, k, return_type="error", \
+    scaling=False, mult=0, eig_mult=1):
+    """
+    compute eigen corrected nystrom approximations
+    versions:
+    1. Eigen corrected without scaling (scaling=False)
+    2. Eigen corrected with scaling (scaling=True)
+    """
+    eps=1e-16
+    list_of_available_indices = range(len(similarity_matrix))
+    # sample_indices = np.sort(random.sample(\
+    #                  list_of_available_indices, k))
+    # A = similarity_matrix[sample_indices][:, sample_indices]
+    # estimating min eig in the following block
+    if mult == 0:
+        large_k = np.int(np.sqrt(k*len(similarity_matrix)))
+    else:
+        large_k = min(mult*k, len(similarity_matrix)-1)
+    larger_sample_indices = np.sort(random.sample(\
+                            list_of_available_indices, large_k))
+    Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
+
+    sample_indices = np.sort(random.sample(\
+                            list(larger_sample_indices), k))
+    A = similarity_matrix[sample_indices][:, sample_indices]
+
     min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
     min_eig = eig_mult*min_eig
     if scaling == True:
@@ -246,6 +288,8 @@ if dataset == "mrpc" or dataset == "rte" or dataset == "stsb":
     filetype = "python"
 if dataset == "twitter":
     similarity_matrix = read_mat_file(file_="./WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
+if dataset == "ohsumed":
+    similarity_matrix = read_mat_file(file_="./WordMoversEmbeddings/mat_files/oshumed_K_set1.mat", version="v7.3")
 if filetype == "python":
     similarity_matrix = read_file(filename)
 # similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
@@ -279,7 +323,7 @@ if dataset != "PSD":
     # symmetrization
     similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
     # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
-id_count = 1000#len(similarity_matrix)-1
+id_count = 1500#len(similarity_matrix)-1
 print(dataset)
 
 # if filename == "rte":
@@ -396,27 +440,27 @@ for k in tqdm(range(10, id_count, 10)):
 #     CUR_diff_error_list.append(error)
 #     pass
 
-# print("CUR")
-# for k in tqdm(range(10, id_count, 10)):
-#     err = 0
-#     for j in range(runs_):
-#         error = CUR(similarity_matrix, k, same=True)
-#         err += error
-#     error = err/np.float(runs_)
-#     CUR_same_error_list.append(error)
-#     pass
+print("CUR")
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    for j in range(runs_):
+        error = CUR(similarity_matrix, k, same=True)
+        err += error
+    error = err/np.float(runs_)
+    CUR_same_error_list.append(error)
+    pass
 
-# print("CUR diff")
-# for k in tqdm(range(10, id_count, 10)):
-#     err = 0
-#     for j in range(runs_):
-#         error = CUR(similarity_matrix, k, same=False)
-#         err += error
-#     error = err/np.float(runs_)
-#     CUR_diff_error_list.append(error)
-#     pass
+print("CUR diff")
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    for j in range(runs_):
+        error = CUR(similarity_matrix, k, same=False)
+        err += error
+    error = err/np.float(runs_)
+    CUR_diff_error_list.append(error)
+    pass
 
-print("alt nyst")
+print("alt CUR")
 for k in tqdm(range(10, id_count, 10)):
     err = 0
     for j in range(runs_):
@@ -449,14 +493,17 @@ for k in tqdm(range(10, id_count, 10)):
 
 #######################################################################
 # SAVE
-# import pickle
-# with open("alt_exp/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
-#     pickle.dump([true_error, CUR_same_error_list, \
-#         CUR_diff_error_list, CUR_alt_error_list], f)
-plt.plot(CUR_alt_error_list)
-plt.plot(true_error)
-plt.ylim(top=2.0, bottom=0.0)
-plt.show()
+import pickle
+with open("alt_exp/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
+    pickle.dump([true_error, CUR_same_error_list, \
+        CUR_diff_error_list, CUR_alt_error_list], f)
+# plt.plot(CUR_alt_error_list, label="CUR alt")
+# plt.plot(true_error, label="nystrom")
+# plt.plot(CUR_diff_error_list, label="CUR diff")
+# plt.plot(CUR_same_error_list, label="CUR same")
+# plt.legend(loc="upper right")
+# # plt.ylim(top=2.0, bottom=0.0)
+# plt.show()
 #######################################################################
 # # PLOTS
 # plot_errors([nscaling_error_list, CUR_same_error_list], \

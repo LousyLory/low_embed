@@ -17,7 +17,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         total_samples = 2176.0
     if name == "recipe":
         total_samples = 27841.0
-    if name == "oshumed":
+    if name == "ohsumed":
         total_samples = 3999.0
     if name == "news":
         total_samples = 11293.0
@@ -81,8 +81,8 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
     plt.locator_params(axis='x', nbins=6)
     if len(y_lims) > 0:
         plt.ylim(bottom=y_lims[0], top=y_lims[1])
-    plt.xlabel("Proportion of dataset chosen as landmark samples")
-    plt.ylabel("Average approximation error")
+    plt.xlabel("Proportion of dataset chosen as landmark samples", fontsize=15)
+    plt.ylabel("Average approximation error", fontsize=15)
     plt.title(title_name, fontsize=21)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     ax1.legend(loc='upper right')

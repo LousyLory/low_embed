@@ -44,7 +44,14 @@ for r in range(runs):
     SMS_eig_vals.append(compute_min_eig(A))
 
 merged_all_eig_vals = list(itertools.chain(*SMS_eig_vals))
+print(len(merged_all_eig_vals))
 
+range_low = -1
+range_high = 1
+clipped_eigvals = []
+for i in range(len(merged_all_eig_vals)):
+    if merged_all_eig_vals[i] > range_low and merged_all_eig_vals[i] < range_high:
+        clipped_eigvals.append(merged_all_eig_vals[i])
 # plot
 if dataset == "twitter":
     title_name = "Twitter"
@@ -71,7 +78,7 @@ plt.rc('legend', fontsize=21)
 cm = plt.cm.get_cmap('RdYlBu_r')
 
 # Plot histogram.
-n, bins, patches = ax1.hist(merged_all_eig_vals, n_bins, color='green')
+n, bins, patches = ax1.hist(clipped_eigvals, n_bins, color='green')
 bin_centers = 0.5 * (bins[:-1] + bins[1:])
 # scale values to interval [0,1]
 col = bin_centers - min(bin_centers)
@@ -81,8 +88,8 @@ for c, p in zip(col, patches):
     plt.setp(p, 'facecolor', cm(c))
 
 # ax1.hist(merged_all_eig_vals, bins=n_bins)
-plt.locator_params(axis='x', nbins=10)
-plt.xlim(left=-5, right=20)
+plt.locator_params(axis='x', nbins=20)
+# plt.xlim(left=-5, right=20)
 plt.xlabel("Bin ranges", fontsize=18)
 plt.ylabel("Number of eigenvalues in range", fontsize=18)
 plt.title(title_name, fontsize=21)

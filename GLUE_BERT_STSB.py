@@ -14,6 +14,30 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
 import random
 
+def CUR_alt(similarity_matrix, k, return_type="error"):
+    """
+    compute CUR approximation
+    versions:
+    U = S2^T K S1
+    """
+    list_of_available_indices = range(len(similarity_matrix))
+    sample_indices_rows = np.sort(random.sample(\
+                     list_of_available_indices, min(k, len(similarity_matrix))))
+    sample_indices_cols = np.sort(random.sample(\
+                     list(sample_indices_rows), int(k/2)))
+    A = similarity_matrix[sample_indices_rows][:, sample_indices_cols]
+    
+    similarity_matrix_x = deepcopy(similarity_matrix)
+    KS_cols = similarity_matrix_x[:, sample_indices_cols]
+    KS_rows = similarity_matrix_x[sample_indices_rows]
+    if return_type == "approximation":
+        return (KS_cols @ np.linalg.pinv(A)) @ KS_rows
+    if return_type == "error":
+        return np.linalg.norm(\
+                similarity_matrix - \
+                KS_cols @ np.linalg.pinv(A) @ KS_rows)\
+                / np.linalg.norm(similarity_matrix)
+
 def CUR(similarity_matrix, k, eps=1e-3, delta=1e-14, return_type="error", same=True):
     """
     implementation of Linear time CUR algorithm of Drineas2006 et. al.
@@ -129,6 +153,52 @@ def nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", \
                 / np.linalg.norm(similarity_matrix), min_eig
     if return_type == "approximation":
         return KS @ np.linalg.pinv(A) @ KS.T
+
+
+def nystrom_with_eig_estimate_sub(similarity_matrix, k, return_type="error", \
+    scaling=False, mult=0, eig_mult=1):
+    """
+    compute eigen corrected nystrom approximations
+    versions:
+    1. Eigen corrected without scaling (scaling=False)
+    2. Eigen corrected with scaling (scaling=True)
+    """
+    eps=1e-16
+    list_of_available_indices = range(len(similarity_matrix))
+    # sample_indices = np.sort(random.sample(\
+    #                  list_of_available_indices, k))
+    # A = similarity_matrix[sample_indices][:, sample_indices]
+    # estimating min eig in the following block
+    if mult == 0:
+        large_k = np.int(np.sqrt(k*len(similarity_matrix)))
+    else:
+        large_k = min(mult*k, len(similarity_matrix)-1)
+    larger_sample_indices = np.sort(random.sample(\
+                            list_of_available_indices, large_k))
+    Z = similarity_matrix[larger_sample_indices][:, larger_sample_indices]
+
+    sample_indices = np.sort(random.sample(\
+                            list(larger_sample_indices), k))
+
+    A = similarity_matrix[sample_indices][:, sample_indices]
+
+    min_eig = min(0, np.min(np.linalg.eigvals(Z))) - eps
+    min_eig = eig_mult*min_eig
+    if scaling == True:
+        min_eig = min_eig*np.float(len(similarity_matrix))/np.float(large_k)
+
+    A = A - min_eig*np.eye(len(A))
+    similarity_matrix_x = deepcopy(similarity_matrix)
+    KS = similarity_matrix_x[:, sample_indices]
+    
+    if return_type == "approximation":
+        return KS @ np.linalg.pinv(A) @ KS.T
+
+    if return_type == "error":
+        return np.linalg.norm(\
+                similarity_matrix - \
+                KS @ np.linalg.pinv(A) @ KS.T)\
+                / np.linalg.norm(similarity_matrix), min_eig
 
 def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
@@ -282,12 +352,17 @@ if mode == "nystrom":
                     mult=2, eig_mult=1.5)
 if mode == "CUR":
     approx_sim_mat = CUR(similarity_matrix, num_samples, return_type="approximation")
+
+if mode == "CUR_alt":
+    approx_sim_mat = CUR_alt(similarity_matrix, num_samples, return_type="approximation")
+
+approx_sim_mat = add_rows_back(approx_sim_mat, duplicate_ids, matched_ids)
+
 print("error:", 
     np.linalg.norm(reshaped_preds-approx_sim_mat)/ np.linalg.norm(reshaped_preds))
 #########################################################################################
 
 #============================ compute approximation error ==============================#
-approx_sim_mat = add_rows_back(approx_sim_mat, duplicate_ids, matched_ids)
 # print("approximate similarity scores "+str(num_samples))
 # print(np.min(approx_sim_mat), np.max(approx_sim_mat), \
 #     np.min(original_scores[:,2]), np.max(original_scores[:,2]))

@@ -287,9 +287,13 @@ if dataset == "mrpc" or dataset == "rte" or dataset == "stsb":
     filename = "../GYPSUM/"+dataset+"_predicts_0.npy"
     filetype = "python"
 if dataset == "twitter":
-    similarity_matrix = read_mat_file(file_="./WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
+    similarity_matrix = read_mat_file(file_="/mnt/nfs/work1/elm/ray/twitter_K_set1.mat")
 if dataset == "ohsumed":
     similarity_matrix = read_mat_file(file_="./WordMoversEmbeddings/mat_files/oshumed_K_set1.mat", version="v7.3")
+if dataset == "recipe":
+    similarity_matrix = read_mat_file(file_="/mnt/nfs/work1/elm/ray/recipe_trainData.mat", version="v7.3")
+if dataset == "news":
+    similarity_matrix = read_mat_file(file_="/mnt/nfs/work1/elm/ray/20ng2_new_K_set1.mat", version="v7.3")
 if filetype == "python":
     similarity_matrix = read_file(filename)
 # similarity_matrix = read_file("../GYPSUM/"+filename+"_predicts_0.npy")
@@ -352,16 +356,16 @@ for k in tqdm(range(10, id_count, 10)):
     pass    
 
 ######################## eigen corrected uniform sampling ###################
-# eps=1e-16
-# min_eig_val = min(0, np.min(np.linalg.eigvals(similarity_matrix))) - eps
-# for k in tqdm(range(10, id_count, 10)):
-#     err = 0
-#     for j in range(runs_):
-#         error = nystrom(similarity_matrix, k, min_eig_mode=True, min_eig=min_eig_val)
-#         err += error
-#     error = err/np.float(runs_)
-#     KS_ncorrected_error_list.append(error)
-#     pass
+eps=1e-16
+min_eig_val = min(0, np.min(np.linalg.eigvals(similarity_matrix))) - eps
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    for j in range(runs_):
+        error = nystrom(similarity_matrix, k, min_eig_mode=True, min_eig=min_eig_val)
+        err += error
+    error = err/np.float(runs_)
+    KS_ncorrected_error_list.append(error)
+    pass
 
 
 # for k in tqdm(range(10, id_count, 10)):
@@ -376,19 +380,19 @@ for k in tqdm(range(10, id_count, 10)):
 #     scaling_error_list.append(error)
 #     pass
 
-# print("our Nystrom")
-# for k in tqdm(range(10, id_count, 10)):
-#     err = 0
-#     min_eig_agg = 0
-#     for j in range(runs_):
-#         error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, \
-#             return_type="error", mult=2, eig_mult=1.5)
-#         err += error
-#         min_eig_agg += min_eig
-#     error = err/np.float(runs_)
-#     min_eig_nscaling.append(min_eig_agg/np.float(runs_))
-#     nscaling_error_list.append(error)
-#     pass    
+print("our Nystrom")
+for k in tqdm(range(10, id_count, 10)):
+    err = 0
+    min_eig_agg = 0
+    for j in range(runs_):
+        error, min_eig = nystrom_with_eig_estimate_sub(similarity_matrix, k, \
+            return_type="error", mult=2, eig_mult=1.5)
+        err += error
+        min_eig_agg += min_eig
+    error = err/np.float(runs_)
+    min_eig_nscaling.append(min_eig_agg/np.float(runs_))
+    nscaling_error_list.append(error)
+    pass    
 
 # for k in tqdm(range(10, id_count, 10)):
 #     err = 0
@@ -450,15 +454,15 @@ for k in tqdm(range(10, id_count, 10)):
     CUR_same_error_list.append(error)
     pass
 
-print("CUR diff")
-for k in tqdm(range(10, id_count, 10)):
-    err = 0
-    for j in range(runs_):
-        error = CUR(similarity_matrix, k, same=False)
-        err += error
-    error = err/np.float(runs_)
-    CUR_diff_error_list.append(error)
-    pass
+# print("CUR diff")
+# for k in tqdm(range(10, id_count, 10)):
+#     err = 0
+#     for j in range(runs_):
+#         error = CUR(similarity_matrix, k, same=False)
+#         err += error
+#     error = err/np.float(runs_)
+#     CUR_diff_error_list.append(error)
+#     pass
 
 print("alt CUR")
 for k in tqdm(range(10, id_count, 10)):
@@ -494,9 +498,11 @@ for k in tqdm(range(10, id_count, 10)):
 #######################################################################
 # SAVE
 import pickle
-with open("alt_exp/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
-    pickle.dump([true_error, CUR_same_error_list, \
-        CUR_diff_error_list, CUR_alt_error_list], f)
+with open("approx_exps/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
+    pickle.dump([true_error, KS_ncorrected_error_list,\
+        nscaling_error_list, \
+        CUR_same_error_list, \
+        CUR_alt_error_list], f)
 # plt.plot(CUR_alt_error_list, label="CUR alt")
 # plt.plot(true_error, label="nystrom")
 # plt.plot(CUR_diff_error_list, label="CUR diff")

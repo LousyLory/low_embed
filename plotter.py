@@ -7,6 +7,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
 
 
     x_axis = list(range(10, id_count, step))
+    print(name)
     if name == "stsb":
         total_samples = 3000.0
     if name == "mrpc":
@@ -50,7 +51,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
     # if colormaps == 1:
     #     colormap = plt.cm.cool
     #     colors = [colormap(i) for i in np.linspace(0, 1,len(ax1.lines))]
-    colors = ["#FC5A50", "#069AF3", "#15B01A", "#9A0EEA"]
+    colors = ["#FC5A50", "#069AF3", "#15B01A", "#9A0EEA", "#DAA520"]
 
     for i,j in enumerate(ax1.lines):
         j.set_color(colors[i])
@@ -68,7 +69,7 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         title_name = "RecipeL"
     if title_name == "news":
         title_name = "20-News"
-    if title_name == "oshumed":
+    if title_name == "ohsumed":
         title_name = "Ohsumed"
 
     directory = "figures/"+save_path+"/"

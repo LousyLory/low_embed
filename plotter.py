@@ -40,13 +40,17 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
     plt.rc('ytick', labelsize=13)
     plt.rc('legend', fontsize=18)
 
-    STYLE_MAP = {"plot":{"marker":".", "markersize":7, "linewidth":1}}
+    STYLE_MAP = {"plot0":{"marker":"^", "markersize":7, "linewidth":1},\
+                 "plot1":{"marker":"v", "markersize":7, "linewidth":1},
+                 "plot2":{"marker":"o", "markersize":7, "linewidth":1},
+                 "plot3":{"marker":"*", "markersize":7, "linewidth":1},
+                 "plot4":{"marker":".", "markersize":7, "linewidth":1}}
 
     for i in range(len(lists)):
         error_pairs = lists[i]
         arr1 = np.array(error_pairs)
         ax1.plot(np.array(x_axis),arr1,\
-            label=labels[i], **STYLE_MAP["plot"], alpha=0.5)
+            label=labels[i], **STYLE_MAP["plot"+str(i)], alpha=0.5)
 
     # if colormaps == 1:
     #     colormap = plt.cm.cool

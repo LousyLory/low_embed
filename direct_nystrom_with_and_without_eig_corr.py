@@ -55,8 +55,12 @@ def CUR_alt(similarity_matrix, k, mult=2, return_type="error"):
     list_of_available_indices = range(len(similarity_matrix))
     sample_indices_rows = np.sort(random.sample(\
                      list_of_available_indices, min(k, len(similarity_matrix))))
-    sample_indices_cols = np.sort(random.sample(\
-                     list(sample_indices_rows), int(k/mult)))
+    if mult > 1:
+        sample_indices_cols = np.sort(random.sample(\
+                         list(sample_indices_rows), int(k/mult)))
+    else:
+        sample_indices_cols = np.sort(random.sample(\
+                     list_of_available_indices, min(k, len(similarity_matrix))))
     A = similarity_matrix[sample_indices_rows][:, sample_indices_cols]
     
     similarity_matrix_x = deepcopy(similarity_matrix)
@@ -287,7 +291,7 @@ if dataset == "mrpc" or dataset == "rte" or dataset == "stsb":
     filename = "../GYPSUM/"+dataset+"_predicts_0.npy"
     filetype = "python"
 if dataset == "twitter":
-    similarity_matrix = read_mat_file(file_="/mnt/nfs/work1/elm/ray/twitter_K_set1.mat")
+    similarity_matrix = read_mat_file(file_="./WordMoversEmbeddings/mat_files/twitter_K_set1.mat")
 if dataset == "ohsumed":
     similarity_matrix = read_mat_file(file_="./WordMoversEmbeddings/mat_files/oshumed_K_set1.mat", version="v7.3")
 if dataset == "recipe":
@@ -327,7 +331,7 @@ if dataset != "PSD":
     # symmetrization
     similarity_matrix = (similarity_matrix_O + similarity_matrix_O.T) / 2.0
     # print("is the current matrix PSD? ", is_pos_def(similarity_matrix))
-id_count = 1500#len(similarity_matrix)-1
+id_count = len(similarity_matrix)-1
 print(dataset)
 
 # if filename == "rte":
@@ -480,7 +484,7 @@ for k in tqdm(range(10, id_count, 10)):
         error = CUR_alt(similarity_matrix, k, mult=1)
         err += error
     error = err/np.float(runs_)
-    SKCUR_error_list.append(error)
+    SkCUR_error_list.append(error)
     pass
 
 
@@ -508,17 +512,18 @@ for k in tqdm(range(10, id_count, 10)):
 #######################################################################
 # SAVE
 import pickle
-with open("approx_exps/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
+with open("alt_exp/"+dataset+"_nystrom_only_vals.pkl", "wb") as f:
     pickle.dump([true_error, \
         nscaling_error_list, \
         CUR_same_error_list, \
         CUR_diff_error_list, \
         SiCUR_error_list, \
         SkCUR_error_list], f)
-# plt.plot(CUR_alt_error_list, label="CUR alt")
+# plt.plot(SiCUR_alt_error_list, label="CUR alt")
 # plt.plot(true_error, label="nystrom")
 # plt.plot(CUR_diff_error_list, label="CUR diff")
 # plt.plot(CUR_same_error_list, label="CUR same")
+# plt.plot(SkCUR_alt_error_list, label="CUR alt")
 # plt.legend(loc="upper right")
 # # plt.ylim(top=2.0, bottom=0.0)
 # plt.show()

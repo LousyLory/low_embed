@@ -13,7 +13,8 @@ import pickle
 #     with open(file_, "rb") as f:
 #         # lists = pickle.load(f)
 #         # print(len(lists))
-#         true_nystrom, min_eig_nystrom, our_nystrom, CUR, CUR_alt = pickle.load(f)
+#         true_error, nscaling_error_list, CUR_same_error_list, CUR_diff_error_list, \
+#             SiCUR_error_list, SkCUR_error_list = pickle.load(f)
 #     f.close()
 
 #     file_ = file_.split("\\")[-1]
@@ -24,7 +25,7 @@ import pickle
 #         nom = "news"
 
 #     if nom == "rte" or nom == "mrpc":
-#         id_count = len(true_nystrom)*10 + 10
+#         id_count = len(true_error)*10 + 10
 #     else:
 #         id_count = 1500
 #     min_y = 0.0
@@ -35,9 +36,9 @@ import pickle
 #     if nom == "news" or nom == "mrpc" or nom == "recipe":
 #         max_y = 0.5
 
-#     plot_errors([true_nystrom, min_eig_nystrom, our_nystrom, CUR, CUR_alt], \
-#                  id_count, \
-#                  ["Nystrom", "min-eig Nystrom", "SMS-Nystrom", "SiCUR", "StaCUR"], \
+#     plot_errors([true_error, nscaling_error_list, CUR_same_error_list, CUR_diff_error_list, \
+#             SiCUR_error_list, SkCUR_error_list], id_count, \
+#                  ["Nystrom", "SMS-Nystrom", "StaCUR(s)", "StaCUR(d)", "StaCUR", "SkeletonApprox"], \
 #                  step=10, \
 #                  colormaps=1, name=nom, \
 #                  save_path="comparison_all_versions", \
@@ -78,22 +79,24 @@ for file_ in files:
                      save_path="comparison_true_nystrom_vs_CUR", y_lims=[0.0, 1.0])
 
     if mode == "nystrom vs cur variants":
-        true_nystrom = data[0]
-        CUR = data[1]
-        CUR_diff = data[2]
-        CUR_alt = data[3]
+        true_error = data[0]
+        sms = data[1]
+        CURs = data[2]
+        CURd = data[3]
+        SiCUR = data[4]
+        SkCUR = data[5]
 
-        name, id_count = name_corrector_and_idcount(file_, true_nystrom)
+        name, id_count = name_corrector_and_idcount(file_, true_error)
 
         if name == "twitter" or name == "PSD" or name == "ohsumed":
-            y_lim = []
+            y_lim = [0.0, 0.8]
         else:
             y_lim = [0.0, 2.0]
 
 
-        plot_errors([true_nystrom, CUR, CUR_diff, CUR_alt], \
+        plot_errors([true_error, sms, CURs, CURd, SiCUR, SkCUR], \
                      id_count, \
-                     ["Nystrom", "CUR same", "CUR diff", "StaCUR"], \
+                     ["Nystrom", "SMS-Nystrom", "SiCUR(s)", "SiCUR(d)", "StaCUR", "SkeletonApprox"], \
                      step=10, \
                      colormaps=1, name=name, \
                      save_path="comparison_true_nystrom_vs_CUR_variants", y_lims=y_lim)

@@ -50,12 +50,12 @@ def plot_errors(lists, id_count, labels, step=10, colormaps=1, name="MRPC", \
         error_pairs = lists[i]
         arr1 = np.array(error_pairs)
         ax1.plot(np.array(x_axis),arr1,\
-            label=labels[i], **STYLE_MAP["plot"+str(i)], alpha=0.5)
+            label=labels[i], **STYLE_MAP["plot4"], alpha=0.5)
 
     # if colormaps == 1:
     #     colormap = plt.cm.cool
     #     colors = [colormap(i) for i in np.linspace(0, 1,len(ax1.lines))]
-    colors = ["#FC5A50", "#069AF3", "#15B01A", "#9A0EEA", "#DAA520"]
+    colors = ["#FC5A50", "#069AF3", "#15B01A", "#9A0EEA", "#DAA520", "#580F41"]
 
     for i,j in enumerate(ax1.lines):
         j.set_color(colors[i])

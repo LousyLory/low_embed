@@ -375,8 +375,7 @@ for k in tqdm(range(10, id_count, 10)):
 #         error, min_eig = nystrom_with_eig_estimate(similarity_matrix, k, return_type="error", scaling=True)
 #         err += error
 #         min_eig_agg += min_eig
-#     error = err/np.float(runs_)
-#     min_eig_scaling.append(min_eig_agg/np.float(runs_))
+#     error = err/np.float(runs_)SS
 #     scaling_error_list.append(error)
 #     pass
 
